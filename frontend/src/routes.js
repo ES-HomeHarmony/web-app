@@ -42,7 +42,6 @@ import Billing from "layouts/billing";
 import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 
-
 // @mui icons
 import Icon from "@mui/material/Icon";
 
@@ -87,7 +86,6 @@ const routes = [
     route: "/profile",
     component: <Profile />,
   },
-
 ];
 
 export default routes;
