@@ -33,6 +33,8 @@ import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 // Dashboard components
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 
+import SignInButton from "../../SignInButton"; // Import the SignInButton
+
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
 
@@ -93,6 +95,7 @@ function Dashboard() {
               />
             </MDBox>
           </Grid>
+          <SignInButton></SignInButton>
         </Grid>
         <MDBox mt={4.5}>
           <Grid container spacing={3}>
