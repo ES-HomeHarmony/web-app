@@ -36,6 +36,7 @@ function PlatformSettings() {
       <MDBox pt={1} pb={2} px={2} lineHeight={1.25}>
         <MDTypography variant="caption" fontWeight="bold" color="text" textTransform="uppercase">
           Email Notifications
+
         </MDTypography>
         <MDBox display="flex" alignItems="center" mb={0.5} ml={-1.5}>
           <MDBox mt={0.5}>
@@ -44,6 +45,7 @@ function PlatformSettings() {
           <MDBox width="80%" ml={0.5}>
             <MDTypography variant="button" fontWeight="regular" color="text">
               Email me when someone pays the rent
+
             </MDTypography>
           </MDBox>
         </MDBox>
@@ -54,6 +56,7 @@ function PlatformSettings() {
           <MDBox width="80%" ml={0.5}>
             <MDTypography variant="button" fontWeight="regular" color="text">
               Email me when a resident&apos;s rent payment is overdue
+
             </MDTypography>
           </MDBox>
         </MDBox>
@@ -64,12 +67,14 @@ function PlatformSettings() {
           <MDBox width="80%" ml={0.5}>
             <MDTypography variant="button" fontWeight="regular" color="text">
               Email me when a resident reports an issue
+
             </MDTypography>
           </MDBox>
         </MDBox>
         <MDBox mt={3}>
           <MDTypography variant="caption" fontWeight="bold" color="text" textTransform="uppercase">
             Push Notifications
+
           </MDTypography>
         </MDBox>
         <MDBox display="flex" alignItems="center" mb={0.5} ml={-1.5}>
@@ -79,6 +84,7 @@ function PlatformSettings() {
           <MDBox width="80%" ml={0.5}>
             <MDTypography variant="button" fontWeight="regular" color="text">
               Notify me when someone pays the rent
+
             </MDTypography>
           </MDBox>
         </MDBox>
@@ -89,6 +95,7 @@ function PlatformSettings() {
           <MDBox width="80%" ml={0.5}>
             <MDTypography variant="button" fontWeight="regular" color="text">
               Notify me when a resident&apos;s rent payment is overdue
+
             </MDTypography>
           </MDBox>
         </MDBox>
@@ -99,6 +106,7 @@ function PlatformSettings() {
           <MDBox width="80%" ml={0.5}>
             <MDTypography variant="button" fontWeight="regular" color="text">
               Notify me when a resident reports an issue
+
             </MDTypography>
           </MDBox>
         </MDBox>
