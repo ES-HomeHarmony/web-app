@@ -39,7 +39,7 @@ const Callback = () => {
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
         }
       );
-
+      console.log("Token response:", response.data); // Log the full response
       const { access_token, id_token, refresh_token } = response.data;
 
       // Store the tokens in local storage or state management solution
