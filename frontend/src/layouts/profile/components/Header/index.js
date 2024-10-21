@@ -34,7 +34,7 @@ import breakpoints from "assets/theme/base/breakpoints";
 import burceMars from "assets/images/bruce-mars.jpg";
 import backgroundImage from "assets/images/bg-profile.png";
 
-function Header({ children }) {
+function Header({ name, children }) {
   const [tabsOrientation, setTabsOrientation] = useState("horizontal");
   const [tabValue, setTabValue] = useState(0);
 
@@ -95,7 +95,7 @@ function Header({ children }) {
           <Grid item>
             <MDBox height="100%" mt={0.5} lineHeight={1}>
               <MDTypography variant="h5" fontWeight="medium">
-                Guilherme Santos
+                {name}
               </MDTypography>
               <MDTypography variant="button" color="text" fontWeight="regular">
                 Landlord
@@ -114,9 +114,16 @@ Header.defaultProps = {
   children: "",
 };
 
+// Setting default props for the Header
+Header.defaultProps = {
+  children: "",
+  name: "User Name", // Default value for the name prop
+};
+
 // Typechecking props for the Header
 Header.propTypes = {
   children: PropTypes.node,
+  name: PropTypes.string, // Add prop type for the name
 };
 
 export default Header;

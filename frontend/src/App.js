@@ -53,7 +53,6 @@ import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "co
 import brandWhite from "assets/images/HomeHarmonyLogo.png";
 import brandDark from "assets/images/HomeHarmonyLogo.png";
 
-import SignInButton from "./SignInButton"; // Import the SignInButton
 import Callback from "./Callback"; // Adjust path if necessary
 
 export default function App() {
