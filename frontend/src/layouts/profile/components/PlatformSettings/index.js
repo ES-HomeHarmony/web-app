@@ -32,15 +32,10 @@ function PlatformSettings() {
   const [newsletter, setNewsletter] = useState(false);
 
   return (
-    <Card sx={{ boxShadow: "none" }}>
-      <MDBox p={2}>
-        <MDTypography variant="h6" fontWeight="medium" textTransform="capitalize">
-          platform settings
-        </MDTypography>
-      </MDBox>
+    <Card sx={{ boxShadow: "none", width: "100%" }}>
       <MDBox pt={1} pb={2} px={2} lineHeight={1.25}>
         <MDTypography variant="caption" fontWeight="bold" color="text" textTransform="uppercase">
-          account
+          Email Notifications
         </MDTypography>
         <MDBox display="flex" alignItems="center" mb={0.5} ml={-1.5}>
           <MDBox mt={0.5}>
@@ -48,7 +43,7 @@ function PlatformSettings() {
           </MDBox>
           <MDBox width="80%" ml={0.5}>
             <MDTypography variant="button" fontWeight="regular" color="text">
-              Email me when someone follows me
+              Email me when someone pays the rent
             </MDTypography>
           </MDBox>
         </MDBox>
@@ -58,7 +53,7 @@ function PlatformSettings() {
           </MDBox>
           <MDBox width="80%" ml={0.5}>
             <MDTypography variant="button" fontWeight="regular" color="text">
-              Email me when someone answers on my post
+              Email me when a resident&apos;s rent payment is overdue
             </MDTypography>
           </MDBox>
         </MDBox>
@@ -68,13 +63,13 @@ function PlatformSettings() {
           </MDBox>
           <MDBox width="80%" ml={0.5}>
             <MDTypography variant="button" fontWeight="regular" color="text">
-              Email me when someone mentions me
+              Email me when a resident reports an issue
             </MDTypography>
           </MDBox>
         </MDBox>
         <MDBox mt={3}>
           <MDTypography variant="caption" fontWeight="bold" color="text" textTransform="uppercase">
-            application
+            Push Notifications
           </MDTypography>
         </MDBox>
         <MDBox display="flex" alignItems="center" mb={0.5} ml={-1.5}>
@@ -83,7 +78,7 @@ function PlatformSettings() {
           </MDBox>
           <MDBox width="80%" ml={0.5}>
             <MDTypography variant="button" fontWeight="regular" color="text">
-              New launches and projects
+              Notify me when someone pays the rent
             </MDTypography>
           </MDBox>
         </MDBox>
@@ -93,7 +88,7 @@ function PlatformSettings() {
           </MDBox>
           <MDBox width="80%" ml={0.5}>
             <MDTypography variant="button" fontWeight="regular" color="text">
-              Monthly product updates
+              Notify me when a resident&apos;s rent payment is overdue
             </MDTypography>
           </MDBox>
         </MDBox>
@@ -103,7 +98,7 @@ function PlatformSettings() {
           </MDBox>
           <MDBox width="80%" ml={0.5}>
             <MDTypography variant="button" fontWeight="regular" color="text">
-              Subscribe to newsletter
+              Notify me when a resident reports an issue
             </MDTypography>
           </MDBox>
         </MDBox>
