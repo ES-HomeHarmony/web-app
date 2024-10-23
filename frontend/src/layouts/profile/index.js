@@ -105,7 +105,6 @@ function Overview() {
   if (loading) {
     return <div>Loading profile...</div>; // Loading state until the data is fetched
   }
-
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -173,7 +172,6 @@ function Overview() {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-
       <Footer />
     </DashboardLayout>
   );
