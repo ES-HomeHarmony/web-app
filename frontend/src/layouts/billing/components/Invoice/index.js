@@ -23,7 +23,7 @@ import Icon from "@mui/material/Icon";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 
-function Invoice({ date, id, price, noGutter }) {
+function Invoice({ date, expenseType, price, noGutter }) {
   return (
     <MDBox
       component="li"
@@ -36,10 +36,10 @@ function Invoice({ date, id, price, noGutter }) {
     >
       <MDBox lineHeight={1.125}>
         <MDTypography display="block" variant="button" fontWeight="medium">
-          {date}
+          {expenseType}
         </MDTypography>
-        <MDTypography variant="caption" fontWeight="regular" color="text">
-          {id}
+        <MDTypography variant="caption" fontWeight="regular" color="error">
+          {date}
         </MDTypography>
       </MDBox>
       <MDBox display="flex" alignItems="center">
@@ -65,7 +65,7 @@ Invoice.defaultProps = {
 // Typechecking props for the Invoice
 Invoice.propTypes = {
   date: PropTypes.string.isRequired,
-  id: PropTypes.string.isRequired,
+  expenseType: PropTypes.string.isRequired,
   price: PropTypes.string.isRequired,
   noGutter: PropTypes.bool,
 };

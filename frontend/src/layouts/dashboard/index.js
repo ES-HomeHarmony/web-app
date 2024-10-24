@@ -39,8 +39,12 @@ import SignUpButton from "../../SignUnButton";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+import { useNavigate } from "react-router-dom";
+
+// Inside the Dashboard component
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
+  const navigate = useNavigate(); // Hook to navigate programmatically
 
   const [logged, setLogged] = useState(false);
   const [jwtToken, setJwtToken] = useState(null);
@@ -63,6 +67,14 @@ function Dashboard() {
     const signUpUrl = `https://${cognitoDomain}/signup?client_id=${clientId}&response_type=code&scope=openid+email+profile&redirect_uri=${redirectSignUp}`;
     window.location.href = signUpUrl; // Redirect to Cognito hosted sign-up page
   }
+
+  const handleAddHouseClick = () => {
+    navigate("/tables"); // Replace '/add-house' with your desired route
+  };
+
+  const handleHouseClick = (houseName) => {
+    navigate("/billing", { state: { selectedHouse: houseName } }); // Pass the selected house name as state
+  };
 
   useEffect(() => {
     const getCodeFromURL = () => {
@@ -107,38 +119,6 @@ function Dashboard() {
       }
     };
 
-    const userExistsInDatabase = async (cognitoId) => {
-      try {
-        const response = await axios.get(`http://localhost:8000/users/${cognitoId}`);
-        return response.status === 200; // User exists if the response status is 200
-      } catch (error) {
-        if (error.response && error.response.status === 404) {
-          // User not found
-          return false;
-        }
-        console.error("Error checking user existence:", error);
-        return false;
-      }
-    };
-
-    const saveUserInDatabase = async (userData) => {
-      try {
-        // Check if the user already exists in the database
-        const userExists = await userExistsInDatabase(userData.cognito_id);
-        console.log("AQUI1");
-        if (userExists) {
-          console.log("User already exists in the database.");
-          return; // Exit the function if the user already exists
-        }
-
-        // If the user does not exist, save them to the database
-        await axios.post("http://localhost:8000/users/", userData);
-        console.log("User saved successfully!");
-      } catch (error) {
-        console.error("Error saving user to the database:", error);
-      }
-    };
-
     const handleSignIn = async () => {
       const code = getCodeFromURL();
       if (!code) {
@@ -152,18 +132,6 @@ function Dashboard() {
         localStorage.setItem("JWTToken", idToken);
         localStorage.setItem("access_token", accessToken);
         setLogged(true);
-
-        const base64Url = idToken.split(".")[1];
-        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-        const jsonPayload = JSON.parse(atob(base64));
-
-        const userData = {
-          cognito_id: jsonPayload.sub,
-          name: "NAME",
-          email: jsonPayload.email,
-        };
-
-        await saveUserInDatabase(userData);
       }
     };
 
@@ -180,7 +148,11 @@ function Dashboard() {
       <MDBox py={3}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
+            <MDBox
+              mb={1.5}
+              onClick={() => handleHouseClick("House Aveiro")}
+              style={{ cursor: "pointer" }}
+            >
               <ComplexStatisticsCard
                 color="primary"
                 icon="house"
@@ -193,7 +165,11 @@ function Dashboard() {
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
+            <MDBox
+              mb={1.5}
+              onClick={() => handleHouseClick("House Lisbon")}
+              style={{ cursor: "pointer" }}
+            >
               <ComplexStatisticsCard
                 color="info"
                 icon="house"
@@ -206,7 +182,11 @@ function Dashboard() {
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
+            <MDBox
+              mb={1.5}
+              onClick={() => handleHouseClick("House Porto")}
+              style={{ cursor: "pointer" }}
+            >
               <ComplexStatisticsCard
                 color="warning"
                 icon="house"
@@ -218,8 +198,9 @@ function Dashboard() {
               />
             </MDBox>
           </Grid>
+
           <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
+            <MDBox mb={1.5} onClick={handleAddHouseClick} style={{ cursor: "pointer" }}>
               <ComplexStatisticsCard
                 color="light"
                 icon="add"
@@ -238,7 +219,7 @@ function Dashboard() {
               ) : (
                 <div>
                   <h3>Please log in to access the dashboard features.</h3>
-                  <SignInButton onClick={redirectToSignIn} />{" "}
+                  <SignInButton onClick={redirectToSignIn} />
                   <SignUpButton onClick={redirectToSignUp} />
                 </div>
               )}
@@ -247,9 +228,6 @@ function Dashboard() {
         </Grid>
         <MDBox mt={4.5}>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6} lg={8}>
-              <Invoices />
-            </Grid>
             <Grid item xs={12} md={6} lg={4}>
               <OrdersOverview />
             </Grid>
