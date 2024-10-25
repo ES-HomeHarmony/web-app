@@ -5,6 +5,9 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import { Button, TextField } from "@mui/material";
 import Icon from "@mui/material/Icon";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 function BillingInformation({ selectedHouse, addInvoice }) {
   const [expenseType, setExpenseType] = useState("");
@@ -13,17 +16,59 @@ function BillingInformation({ selectedHouse, addInvoice }) {
   const [selectedFile, setSelectedFile] = useState(null);
 
   const handleSubmit = () => {
-    if (expenseType && price && deadline) {
-      addInvoice(expenseType, price, deadline, selectedFile);
-      setExpenseType("");
-      setPrice("");
-      setDeadline("");
-      setSelectedFile(null);
+    if (!expenseType || !price || !deadline) {
+      toast.error("Please fill out all fields."); // Show error notification
+      return;
     }
+
+    if (!selectedFile) {
+      toast.error("Please upload a valid file."); // Show error notification
+      return;
+    }
+
+    // Create FormData to send the file along with other data
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("expenseType", expenseType);
+    formData.append("price", price);
+    formData.append("deadline", deadline);
+    formData.append("house", selectedHouse);
+
+    // Make the POST request to the backend
+    // axios
+    //   .post("/api/upload", formData)
+    //   .then((response) => {
+    //     toast.success("File uploaded successfully!"); // Show success notification
+    addInvoice(expenseType, price, deadline, selectedFile); // Optionally add the new invoice locally
+    // Clear the form
+    setExpenseType("");
+    setPrice("");
+    setDeadline("");
+    setSelectedFile(null);
+    // })
+    // .catch((error) => {
+    //   toast.error("File upload failed. Please try again."); // Show error notification
+    // });
   };
 
   const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
+    const file = event.target.files[0];
+    const validTypes = ["application/pdf", "image/jpeg", "image/png"];
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+
+    if (!validTypes.includes(file.type)) {
+      alert("Invalid file type. Please upload a PDF, JPEG, or PNG file."); // Show error notification
+      setSelectedFile(null);
+      return;
+    }
+
+    if (file.size > maxSize) {
+      alert("File size exceeds the maximum limit of 5MB."); // Show error notification
+      setSelectedFile(null);
+      return;
+    }
+
+    setSelectedFile(file); // Set the file if valid
   };
 
   return (
@@ -85,7 +130,7 @@ function BillingInformation({ selectedHouse, addInvoice }) {
             >
               <Icon fontSize="small">picture_as_pdf</Icon>
               <MDTypography variant="button" fontWeight="bold">
-                &nbsp;{selectedFile ? selectedFile.name : "Upload PDF"}
+                &nbsp;{selectedFile ? selectedFile.name : "Upload File (PDF, JPEG, PNG)"}
               </MDTypography>
             </MDBox>
           </label>
@@ -97,6 +142,10 @@ function BillingInformation({ selectedHouse, addInvoice }) {
           >
             Save Changes
           </Button>
+          <div>
+            {/* Your existing code */}
+            <ToastContainer />
+          </div>
         </MDBox>
       </MDBox>
     </Card>

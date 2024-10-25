@@ -21,6 +21,8 @@ import Invoices from "layouts/billing/components/Invoices";
 import BillingInformation from "layouts/billing/components/BillingInformation";
 import Transactions from "layouts/billing/components/Transactions";
 
+import axios from "axios";
+
 function Billing() {
   const location = useLocation();
   const [selectedHouse, setSelectedHouse] = useState("");
@@ -36,15 +38,31 @@ function Billing() {
     }
   }, [location.state]);
 
+  // Fetch expenses when the selected house changes **for the backend to work**
+  // useEffect(() => {
+  //   if (selectedHouse) {
+  //     axios
+  //       .get(`/api/expenses?house=${selectedHouse}`)
+  //       .then((response) => {
+  //         setInvoices(response.data); // Update the state with the filtered expenses
+  //       })
+  //       .catch((error) => {
+  //         console.error("There was an error fetching the expenses!", error);
+  //       });
+  //   }
+  // }, [selectedHouse]);
+
   // Function to add a new invoice
+  // Add the selected house when creating a new invoice
   const addInvoice = (expenseType, price, deadline, file) => {
     const newInvoice = {
       date: deadline,
-      expenseType: expenseType, // Generate a random ID
+      expenseType: expenseType,
       price: `€${price}`,
       file: file,
+      house: selectedHouse, // Track which house the invoice belongs to
     };
-    setInvoices([...invoices, newInvoice]); // Update the state to include the new invoice
+    setInvoices([...invoices, newInvoice]);
   };
 
   return (
@@ -53,16 +71,16 @@ function Billing() {
       <MDBox mt={8}>
         <MDBox mb={3}>
           <Grid container spacing={3}>
-            <Grid item xs={12} lg={8}>
+            <Grid item xs={12} lg={7}>
+              {/* Select House Dropdown */}
               <Grid item xs={12} xl={6} mb={3}>
-                {/* Material-UI styled dropdown */}
                 <FormControl fullWidth variant="outlined">
                   <InputLabel>Select House</InputLabel>
                   <Select
                     value={selectedHouse}
                     onChange={(e) => setSelectedHouse(e.target.value)}
                     label="Select House"
-                    style={{ fontSize: "16px", padding: "10px" }} // Ensure custom style
+                    style={{ fontSize: "16px", padding: "10px" }}
                   >
                     {houses.map((house) => (
                       <MenuItem key={house} value={house}>
@@ -72,13 +90,19 @@ function Billing() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} xl={8}>
-                <BillingInformation selectedHouse={selectedHouse} addInvoice={addInvoice} />{" "}
-                {/* Pass selectedHouse and addInvoice as props */}
-              </Grid>
+              {/* Add Expenses Form and Expenses Section */}
             </Grid>
-            <Grid item xs={12} lg={4} mt={8}>
-              <Invoices invoices={invoices} />
+          </Grid>
+        </MDBox>
+        <MDBox mb={3}>
+          <Grid container spacing={3}>
+            {/* Left side: Add Expenses Form */}
+            <Grid item xs={12} xl={6}>
+              <BillingInformation selectedHouse={selectedHouse} addInvoice={addInvoice} />
+            </Grid>
+            {/* Right side: Expenses List */}
+            <Grid item xs={12} xl={6}>
+              <Invoices invoices={invoices} selectedHouse={selectedHouse} />
             </Grid>
           </Grid>
         </MDBox>

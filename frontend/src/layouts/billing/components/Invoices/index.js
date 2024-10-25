@@ -25,7 +25,10 @@ import MDButton from "components/MDButton";
 import Invoice from "layouts/billing/components/Invoice";
 import PropTypes from "prop-types";
 
-function Invoices({ invoices }) {
+function Invoices({ invoices, selectedHouse }) {
+  // Filter invoices based on the selected house
+  const filteredInvoices = invoices.filter((invoice) => invoice.house === selectedHouse);
+
   return (
     <Card sx={{ height: "100%" }}>
       <MDBox pt={2} px={2} display="flex" justifyContent="space-between" alignItems="center">
@@ -38,14 +41,14 @@ function Invoices({ invoices }) {
       </MDBox>
       <MDBox p={2}>
         <MDBox component="ul" display="flex" flexDirection="column" p={0} m={0}>
-          {invoices.map((invoice, index) => (
+          {filteredInvoices.map((invoice, index) => (
             <Invoice
               key={index}
               date={invoice.date}
               expenseType={invoice.expenseType}
               price={invoice.price}
               file={invoice.file}
-              noGutter={index === invoices.length - 1}
+              noGutter={index === filteredInvoices.length - 1}
             />
           ))}
         </MDBox>
@@ -61,8 +64,10 @@ Invoices.propTypes = {
       expenseType: PropTypes.string.isRequired,
       price: PropTypes.string.isRequired,
       file: PropTypes.object,
+      house: PropTypes.string.isRequired, // Make sure to include the house property here
     })
   ).isRequired,
+  selectedHouse: PropTypes.string.isRequired, // Add this to prop types
 };
 
 export default Invoices;
