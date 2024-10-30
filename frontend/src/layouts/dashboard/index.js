@@ -51,15 +51,7 @@ function Dashboard() {
   }
 
   async function redirectToLogout() {
-    // window.location.href = "http://localhost:8000/auth/logout";
-    try {
-      const response = await axios.get("http://localhost:8000/auth/logout", {
-        withCredentials: true,
-      });
-      setLogged(false);
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-    }
+    window.location.href = "http://localhost:8000/auth/logout";
   }
 
   useEffect(() => {
