@@ -7,5 +7,5 @@ Feature: User Login and Redirect
     Given a visitor on the landing page
     When they click the "Sign In" button
     Then they should be redirected to the Cognito Hosted UI
-    When they return with a valid access token
+    When they enter valid credentials
     Then they should be authenticated and see their dashboard
