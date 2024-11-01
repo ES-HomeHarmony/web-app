@@ -26,16 +26,9 @@ jobs:
       
       - name: Install Chrome and ChromeDriver
         run: |
-          # Install Chrome
           sudo apt-get update
-          sudo apt-get install -y google-chrome-stable  
-          # Get Chrome version and set ChromeDriver version
-          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' | head -n 1)
-          CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION" || curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")  
-          # Download ChromeDriver
-          wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
-          sudo unzip /tmp/chromedriver.zip -d /usr/local/bin/
-          sudo chmod +x /usr/local/bin/chromedriver
+          sudo apt-get install -y google-chrome-stable chromium-chromedriver
+          sudo ln -s /usr/lib/chromium-browser/chromedriver /usr/local/bin/chromedriver  # Link chromedriver to path
 
       - name: Install dependencies
         working-directory: ./frontend
