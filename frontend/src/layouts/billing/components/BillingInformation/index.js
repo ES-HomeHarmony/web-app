@@ -16,6 +16,11 @@ function BillingInformation({ selectedHouse, addInvoice }) {
   const [selectedFile, setSelectedFile] = useState(null);
 
   const handleSubmit = () => {
+    if (!selectedHouse) {
+      toast.error("Please select a house.");
+      return;
+    }
+
     if (!expenseType || !price || !deadline) {
       toast.error("Please fill out all fields.");
       return;
