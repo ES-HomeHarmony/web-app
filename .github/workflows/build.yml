@@ -28,6 +28,12 @@ jobs:
           pip install -r requirements.txt
           npm install  # Install frontend dependencies
 
+      - name: Have App running
+        working-directory: ./frontend
+        run: |
+          npm install
+          npm start
+
       - name: Run Coverage for Behave Tests
         working-directory: ./frontend
         run: |
