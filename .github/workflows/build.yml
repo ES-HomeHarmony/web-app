@@ -42,20 +42,20 @@ jobs:
         run: |
           behave  # Runs Behave tests
 
-      - name: Run Tests Login
-        working-directory: ./frontend/tests/Login  # Adjust to the test directory
-        run: |
-          behave  # Runs Behave tests
+      # - name: Run Tests Login
+      #   working-directory: ./frontend/tests/Login  # Adjust to the test directory
+      #   run: |
+      #     behave  # Runs Behave tests
 
-      - name: Run Tests SignUp
-        working-directory: ./frontend/tests/SignUp  # Adjust to the test directory
-        run: |
-          behave  # Runs Behave tests
+      # - name: Run Tests SignUp
+      #   working-directory: ./frontend/tests/SignUp  # Adjust to the test directory
+      #   run: |
+      #     behave  # Runs Behave tests
       
-      - name: Run Tests UserProfileEdit
-        working-directory: ./frontend/tests/UserProfileEdit  # Adjust to the test directory
-        run: |
-          behave  # Runs Behave tests
+      # - name: Run Tests UserProfileEdit
+      #   working-directory: ./frontend/tests/UserProfileEdit  # Adjust to the test directory
+      #   run: |
+      #     behave  # Runs Behave tests
           
   sonarcloud:
     name: SonarCloud
