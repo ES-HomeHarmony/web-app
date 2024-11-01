@@ -27,7 +27,7 @@ import PropTypes from "prop-types";
 
 function Invoices({ invoices, selectedHouse }) {
   // Filter invoices based on the selected house
-  const filteredInvoices = invoices.filter((invoice) => invoice.house === selectedHouse);
+  const filteredInvoices = (invoices || []).filter((invoice) => invoice.house === selectedHouse);
 
   return (
     <Card sx={{ height: "100%" }}>

@@ -38,11 +38,13 @@ import SignUpButton from "../../components/SignUpButton";
 import LogoutButton from "../../components/LogoutButton";
 
 import { useState, useEffect } from "react";
-
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Logout } from "@mui/icons-material";
 
 function Dashboard() {
+  const { sales, tasks } = reportsLineChartData;
+  const navigate = useNavigate(); // Hook to navigate programmatically
   const [logged, setLogged] = useState(false);
   const [userName, setUserName] = useState("");
 
@@ -86,13 +88,25 @@ function Dashboard() {
     fetchUserProfile();
   }, []);
 
+  const handleAddHouseClick = () => {
+    navigate("/tables"); // Replace '/add-house' with your desired route
+  };
+
+  const handleHouseClick = (houseName) => {
+    navigate("/billing", { state: { selectedHouse: houseName } }); // Pass the selected house name as state
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox py={3}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
+            <MDBox
+              mb={1.5}
+              onClick={() => handleHouseClick("House Aveiro")}
+              style={{ cursor: "pointer" }}
+            >
               <ComplexStatisticsCard
                 color="primary"
                 icon="house"
@@ -105,7 +119,11 @@ function Dashboard() {
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
+            <MDBox
+              mb={1.5}
+              onClick={() => handleHouseClick("House Lisbon")}
+              style={{ cursor: "pointer" }}
+            >
               <ComplexStatisticsCard
                 color="info"
                 icon="house"
@@ -118,7 +136,11 @@ function Dashboard() {
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
+            <MDBox
+              mb={1.5}
+              onClick={() => handleHouseClick("House Porto")}
+              style={{ cursor: "pointer" }}
+            >
               <ComplexStatisticsCard
                 color="warning"
                 icon="house"
@@ -131,7 +153,7 @@ function Dashboard() {
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
+            <MDBox mb={1.5} onClick={handleAddHouseClick} style={{ cursor: "pointer" }}>
               <ComplexStatisticsCard
                 color="light"
                 icon="add"
