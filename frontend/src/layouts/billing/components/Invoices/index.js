@@ -23,17 +23,13 @@ import MDButton from "components/MDButton";
 
 // Billing page components
 import Invoice from "layouts/billing/components/Invoice";
-import PropTypes from "prop-types";
 
-function Invoices({ invoices, selectedHouse }) {
-  // Filter invoices based on the selected house
-  const filteredInvoices = invoices.filter((invoice) => invoice.house === selectedHouse);
-
+function Invoices() {
   return (
     <Card sx={{ height: "100%" }}>
       <MDBox pt={2} px={2} display="flex" justifyContent="space-between" alignItems="center">
         <MDTypography variant="h6" fontWeight="medium">
-          Expenses
+          Invoices
         </MDTypography>
         <MDButton variant="outlined" color="info" size="small">
           view all
@@ -41,33 +37,15 @@ function Invoices({ invoices, selectedHouse }) {
       </MDBox>
       <MDBox p={2}>
         <MDBox component="ul" display="flex" flexDirection="column" p={0} m={0}>
-          {filteredInvoices.map((invoice, index) => (
-            <Invoice
-              key={index}
-              date={invoice.date}
-              expenseType={invoice.expenseType}
-              price={invoice.price}
-              file={invoice.file}
-              noGutter={index === filteredInvoices.length - 1}
-            />
-          ))}
+          <Invoice date="March, 01, 2020" id="#MS-415646" price="$180" />
+          <Invoice date="February, 10, 2021" id="#RV-126749" price="$250" />
+          <Invoice date="April, 05, 2020" id="#QW-103578" price="$120" />
+          <Invoice date="June, 25, 2019" id="#MS-415646" price="$180" />
+          <Invoice date="March, 01, 2019" id="#AR-803481" price="$300" noGutter />
         </MDBox>
       </MDBox>
     </Card>
   );
 }
-
-Invoices.propTypes = {
-  invoices: PropTypes.arrayOf(
-    PropTypes.shape({
-      date: PropTypes.string.isRequired,
-      expenseType: PropTypes.string.isRequired,
-      price: PropTypes.string.isRequired,
-      file: PropTypes.object,
-      house: PropTypes.string.isRequired, // Make sure to include the house property here
-    })
-  ).isRequired,
-  selectedHouse: PropTypes.string.isRequired, // Add this to prop types
-};
 
 export default Invoices;

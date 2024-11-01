@@ -1,175 +1,61 @@
-import PropTypes from "prop-types";
-import { useState } from "react";
+/**
+=========================================================
+* Material Dashboard 2 React - v2.2.0
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/material-dashboard-react
+* Copyright 2023 Creative Tim (https://www.creative-tim.com)
+
+Coded by www.creative-tim.com
+
+ =========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+*/
+
+// @mui material components
 import Card from "@mui/material/Card";
+
+// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-import { Button, TextField } from "@mui/material";
-import Icon from "@mui/material/Icon";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import axios from "axios";
 
-function BillingInformation({ selectedHouse, addInvoice }) {
-  const [expenseType, setExpenseType] = useState("");
-  const [price, setPrice] = useState("");
-  const [deadline, setDeadline] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
+// Billing page components
+import Bill from "layouts/billing/components/Bill";
 
-  const handleSubmit = () => {
-    if (!selectedHouse) {
-      toast.error("Please select a house.");
-      return;
-    }
-
-    if (!expenseType || !price || !deadline) {
-      toast.error("Please fill out all fields.");
-      return;
-    }
-
-    if (!selectedFile) {
-      toast.error("Please upload a valid file.");
-      return;
-    }
-
-    // Create FormData to send the file along with other data
-    const formData = new FormData();
-    const expenseData = JSON.stringify({
-      house_id: 1, // Use the actual selectedHouse ID if needed
-      amount: price,
-      title: expenseType,
-      deadline_date: deadline,
-    });
-
-    // Append JSON data and file to formData
-    formData.append("expense_data", expenseData);
-    formData.append("file", selectedFile);
-
-    // Make the POST request
-    axios
-      .post("http://localhost:8000/houses/addExpense", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => {
-        toast.success("Expense added successfully!");
-        addInvoice(expenseType, price, deadline, selectedFile);
-        // Clear the form
-        setExpenseType("");
-        setPrice("");
-        setDeadline("");
-        setSelectedFile(null);
-      })
-      .catch((error) => {
-        console.error("Error uploading expense:", error);
-        toast.error("Failed to add expense. Please try again.");
-      });
-  };
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    const validTypes = ["application/pdf", "image/jpeg", "image/png"];
-    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-
-    if (!validTypes.includes(file.type)) {
-      alert("Invalid file type. Please upload a PDF, JPEG, or PNG file."); // Show error notification
-      setSelectedFile(null);
-      return;
-    }
-
-    if (file.size > maxSize) {
-      alert("File size exceeds the maximum limit of 5MB."); // Show error notification
-      setSelectedFile(null);
-      return;
-    }
-
-    setSelectedFile(file); // Set the file if valid
-  };
-
+function BillingInformation() {
   return (
     <Card id="delete-account">
       <MDBox pt={3} px={2}>
         <MDTypography variant="h6" fontWeight="medium">
-          Add Expenses to {selectedHouse}
+          Billing Information
         </MDTypography>
       </MDBox>
       <MDBox pt={1} pb={2} px={2}>
-        <MDBox
-          component="form"
-          noValidate
-          autoComplete="off"
-          display="flex"
-          flexDirection="column"
-          p={0}
-          m={0}
-        >
-          <TextField
-            fullWidth
-            label="Expense Type"
-            value={expenseType}
-            onChange={(e) => setExpenseType(e.target.value)}
-            margin="normal"
+        <MDBox component="ul" display="flex" flexDirection="column" p={0} m={0}>
+          <Bill
+            name="oliver liam"
+            company="viking burrito"
+            email="oliver@burrito.com"
+            vat="FRB1235476"
           />
-          <TextField
-            fullWidth
-            label="Price"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            margin="normal"
+          <Bill
+            name="lucas harper"
+            company="stone tech zone"
+            email="lucas@stone-tech.com"
+            vat="FRB1235476"
           />
-          <TextField
-            fullWidth
-            label="Deadline"
-            type="date" // Change type to "date" for date picker
-            value={deadline}
-            onChange={(e) => setDeadline(e.target.value)}
-            margin="normal"
-            InputLabelProps={{
-              shrink: true, // Ensure the label stays above the date picker
-            }}
+          <Bill
+            name="ethan james"
+            company="fiber notion"
+            email="ethan@fiber.com"
+            vat="FRB1235476"
+            noGutter
           />
-          <input
-            type="file"
-            accept=".pdf,.jpeg,.png"
-            id="upload-button-file"
-            style={{ display: "none" }}
-            onChange={handleFileChange}
-          />
-          <label htmlFor="upload-button-file">
-            <MDBox
-              display="flex"
-              alignItems="center"
-              lineHeight={1}
-              mt={2}
-              sx={{ cursor: "pointer" }}
-            >
-              <Icon fontSize="small">picture_as_pdf</Icon>
-              <MDTypography variant="button" fontWeight="bold">
-                &nbsp;{selectedFile ? selectedFile.name : "Upload File (PDF, JPEG, PNG)"}
-              </MDTypography>
-            </MDBox>
-          </label>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSubmit}
-            style={{ marginTop: "16px", color: "white" }}
-          >
-            Save Changes
-          </Button>
-          <div>
-            {/* Your existing code */}
-            <ToastContainer />
-          </div>
         </MDBox>
       </MDBox>
     </Card>
   );
 }
-
-BillingInformation.propTypes = {
-  selectedHouse: PropTypes.string.isRequired,
-  addInvoice: PropTypes.func.isRequired,
-};
 
 export default BillingInformation;
