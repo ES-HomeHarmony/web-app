@@ -1,20 +1,12 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
+import { useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 // @mui material components
 import Grid from "@mui/material/Grid";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -23,58 +15,99 @@ import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import MasterCard from "examples/Cards/MasterCard";
-import DefaultInfoCard from "examples/Cards/InfoCards/DefaultInfoCard";
 
 // Billing page components
-import PaymentMethod from "layouts/billing/components/PaymentMethod";
 import Invoices from "layouts/billing/components/Invoices";
 import BillingInformation from "layouts/billing/components/BillingInformation";
 import Transactions from "layouts/billing/components/Transactions";
 
+import axios from "axios";
+
 function Billing() {
+  const location = useLocation();
+  const [selectedHouse, setSelectedHouse] = useState("");
+  const [invoices, setInvoices] = useState([]);
+
+  // Houses available
+  const houses = ["House Aveiro", "House Lisbon", "House Porto"];
+
+  // Set the selected house from location state
+  useEffect(() => {
+    if (location.state && location.state.selectedHouse) {
+      setSelectedHouse(location.state.selectedHouse);
+    }
+  }, [location.state]);
+
+  // Fetch expenses when the selected house changes **for the backend to work**
+  // useEffect(() => {
+  //   if (selectedHouse) {
+  //     axios
+  //       .get(`/api/expenses?house=${selectedHouse}`)
+  //       .then((response) => {
+  //         setInvoices(response.data); // Update the state with the filtered expenses
+  //       })
+  //       .catch((error) => {
+  //         console.error("There was an error fetching the expenses!", error);
+  //       });
+  //   }
+  // }, [selectedHouse]);
+
+  // Function to add a new invoice
+  // Add the selected house when creating a new invoice
+  const addInvoice = (expenseType, price, deadline, file) => {
+    const newInvoice = {
+      date: deadline,
+      expenseType: expenseType,
+      price: `€${price}`,
+      file: file,
+      house: selectedHouse, // Track which house the invoice belongs to
+    };
+    setInvoices([...invoices, newInvoice]);
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar absolute isMini />
       <MDBox mt={8}>
         <MDBox mb={3}>
           <Grid container spacing={3}>
-            <Grid item xs={12} lg={8}>
-              <Grid container spacing={3}>
-                <Grid item xs={12} xl={6}>
-                  <MasterCard number={4562112245947852} holder="jack peterson" expires="11/22" />
-                </Grid>
-                <Grid item xs={12} md={6} xl={3}>
-                  <DefaultInfoCard
-                    icon="account_balance"
-                    title="salary"
-                    description="Belong Interactive"
-                    value="+$2000"
-                  />
-                </Grid>
-                <Grid item xs={12} md={6} xl={3}>
-                  <DefaultInfoCard
-                    icon="paypal"
-                    title="paypal"
-                    description="Freelance Payment"
-                    value="$455.00"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <PaymentMethod />
-                </Grid>
+            <Grid item xs={12} lg={7}>
+              {/* Select House Dropdown */}
+              <Grid item xs={12} xl={6} mb={3}>
+                <FormControl fullWidth variant="outlined">
+                  <InputLabel>Select House</InputLabel>
+                  <Select
+                    value={selectedHouse}
+                    onChange={(e) => setSelectedHouse(e.target.value)}
+                    label="Select House"
+                    style={{ fontSize: "16px", padding: "10px" }}
+                  >
+                    {houses.map((house) => (
+                      <MenuItem key={house} value={house}>
+                        {house}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
-            </Grid>
-            <Grid item xs={12} lg={4}>
-              <Invoices />
+              {/* Add Expenses Form and Expenses Section */}
             </Grid>
           </Grid>
         </MDBox>
         <MDBox mb={3}>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={7}>
-              <BillingInformation />
+            {/* Left side: Add Expenses Form */}
+            <Grid item xs={12} xl={6}>
+              <BillingInformation selectedHouse={selectedHouse} addInvoice={addInvoice} />
             </Grid>
+            {/* Right side: Expenses List */}
+            <Grid item xs={12} xl={6}>
+              <Invoices invoices={invoices} selectedHouse={selectedHouse} />
+            </Grid>
+          </Grid>
+        </MDBox>
+        <MDBox mb={3}>
+          <Grid container spacing={3}>
             <Grid item xs={12} md={5}>
               <Transactions />
             </Grid>
