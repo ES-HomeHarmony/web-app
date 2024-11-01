@@ -24,33 +24,29 @@ jobs:
         with:
           python-version: '3.11'  # Use your Python version
 
-      - name: see
-        run: |
-          pwd
-          ls -l
-
       - name: Install dependencies
+        working-directory: ./frontend
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt  # Adjust if requirements are in a different path
 
       - name: Run Tests LandingPage
-        working-directory: ./tests/LandingPage  # Adjust to the test directory
+        working-directory: ./frontend/tests/LandingPage  # Adjust to the test directory
         run: |
           behave  # Runs Behave tests
 
       - name: Run Tests Login
-        working-directory: ./tests/Login  # Adjust to the test directory
+        working-directory: ./frontend/tests/Login  # Adjust to the test directory
         run: |
           behave  # Runs Behave tests
 
       - name: Run Tests SignUp
-        working-directory: ./tests/SignUp  # Adjust to the test directory
+        working-directory: ./frontend/tests/SignUp  # Adjust to the test directory
         run: |
           behave  # Runs Behave tests
       
       - name: Run Tests UserProfileEdit
-        working-directory: ./tests/UserProfileEdit  # Adjust to the test directory
+        working-directory: ./frontend/tests/UserProfileEdit  # Adjust to the test directory
         run: |
           behave  # Runs Behave tests
           
