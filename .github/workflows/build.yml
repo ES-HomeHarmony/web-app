@@ -22,7 +22,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
             args: -Dsonar.projectBaseDir=./frontend
-            
+
     # name: Test and SonarCloud Scan
     # runs-on: ubuntu-latest
     # services:
