@@ -23,11 +23,6 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'  # Use your Python version
-      
-      - name: Display Chrome and ChromeDriver Versions
-        run: |
-          google-chrome --version
-          chromedriver --version
 
       - name: Install dependencies
         working-directory: ./frontend
@@ -38,6 +33,7 @@ jobs:
       - name: Start React Application
         working-directory: ./frontend
         run: |
+          npm install
           nohup npm start &  # Start React app in the background
           sleep 20  # Wait for the app to start; adjust as needed
 
