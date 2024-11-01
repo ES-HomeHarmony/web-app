@@ -21,6 +21,8 @@ import App from "App";
 // Material Dashboard 2 React Context Provider
 import { MaterialUIControllerProvider } from "context";
 
+const isTesting = process.env.REACT_APP_TEST_ENV === "true";
+
 const container = document.getElementById("app");
 const root = createRoot(container);
 

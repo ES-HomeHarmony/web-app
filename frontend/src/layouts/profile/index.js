@@ -29,17 +29,8 @@ function Overview() {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const access_token = localStorage.getItem("access_token"); // Get the ID token from localStorage
-
-        if (!access_token) {
-          console.error("No token found!");
-          return;
-        }
-
         const response = await axios.get("http://localhost:8000/user/profile", {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
+          withCredentials: true,
         });
 
         const { name, email, role } = response.data;

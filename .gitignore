@@ -1,5 +1,5 @@
 .env 
-.sonar
-.env
-node_modules
 coverage
+.coverage
+coverage.xml
+.sonar/
