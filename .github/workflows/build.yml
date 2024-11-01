@@ -17,8 +17,7 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       
       - name: Move to the ./frontend directory
-        run: |
-          cd ./frontend
+        run: cd ./frontend
 
       - name: Set up Python
         uses: actions/setup-python@v4
