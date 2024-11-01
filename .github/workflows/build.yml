@@ -18,7 +18,7 @@ jobs:
       
       - name: Move to the ./frontend directory
         run: |
-          cd frontend
+          cd ./frontend
 
       - name: Set up Python
         uses: actions/setup-python@v4
