@@ -17,38 +17,48 @@ function BillingInformation({ selectedHouse, addInvoice }) {
 
   const handleSubmit = () => {
     if (!expenseType || !price || !deadline) {
-      toast.error("Please fill out all fields."); // Show error notification
+      toast.error("Please fill out all fields.");
       return;
     }
 
     if (!selectedFile) {
-      toast.error("Please upload a valid file."); // Show error notification
+      toast.error("Please upload a valid file.");
       return;
     }
 
     // Create FormData to send the file along with other data
     const formData = new FormData();
-    formData.append("file", selectedFile);
-    formData.append("expenseType", expenseType);
-    formData.append("price", price);
-    formData.append("deadline", deadline);
-    formData.append("house", selectedHouse);
+    const expenseData = JSON.stringify({
+      house_id: 1, // Use the actual selectedHouse ID if needed
+      amount: price,
+      title: expenseType,
+      deadline_date: deadline,
+    });
 
-    // Make the POST request to the backend
-    // axios
-    //   .post("/api/upload", formData)
-    //   .then((response) => {
-    //     toast.success("File uploaded successfully!"); // Show success notification
-    addInvoice(expenseType, price, deadline, selectedFile); // Optionally add the new invoice locally
-    // Clear the form
-    setExpenseType("");
-    setPrice("");
-    setDeadline("");
-    setSelectedFile(null);
-    // })
-    // .catch((error) => {
-    //   toast.error("File upload failed. Please try again."); // Show error notification
-    // });
+    // Append JSON data and file to formData
+    formData.append("expense_data", expenseData);
+    formData.append("file", selectedFile);
+
+    // Make the POST request
+    axios
+      .post("http://localhost:8000/houses/addExpense", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response) => {
+        toast.success("Expense added successfully!");
+        addInvoice(expenseType, price, deadline, selectedFile);
+        // Clear the form
+        setExpenseType("");
+        setPrice("");
+        setDeadline("");
+        setSelectedFile(null);
+      })
+      .catch((error) => {
+        console.error("Error uploading expense:", error);
+        toast.error("Failed to add expense. Please try again.");
+      });
   };
 
   const handleFileChange = (event) => {
@@ -115,7 +125,7 @@ function BillingInformation({ selectedHouse, addInvoice }) {
           />
           <input
             type="file"
-            accept=".pdf"
+            accept=".pdf,.jpeg,.png"
             id="upload-button-file"
             style={{ display: "none" }}
             onChange={handleFileChange}
