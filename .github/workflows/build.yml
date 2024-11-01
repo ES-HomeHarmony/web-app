@@ -13,6 +13,7 @@ jobs:
 
       - name: see
         run: |
+          pwd
           ls -l
 
       - name: Move to the ./frontend directory
