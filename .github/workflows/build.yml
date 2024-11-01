@@ -10,6 +10,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+
+      - name: see
+        run: |
+          ls
+
       - name: Move to the ./frontend directory
         run: |
           cd frontend
