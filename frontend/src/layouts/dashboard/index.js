@@ -28,7 +28,7 @@ function Dashboard() {
   }
 
   async function redirectToLogout() {
-    window.location.href = "http://localhost:8000/auth/logout";
+    window.location.href = "http://localhost:8000/auth/logout"; 
   }
 
   const handleAddHouseClick = () => {

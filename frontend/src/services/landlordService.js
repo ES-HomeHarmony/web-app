@@ -22,7 +22,7 @@ export async function createHouse(houseData) {
 export async function fetchHousesByLandlord(landlordId) {
   try {
     const response = await axios.get(`${API_URL}/houses/landlord/${landlordId}`, {
-      withCredentials: true, // Inclui cookies de autenticação, se necessário
+      withCredentials: true, // Inclui cookies de autenticação
     });
     return response.data; // Retorna os dados em JSON
   } catch (error) {
