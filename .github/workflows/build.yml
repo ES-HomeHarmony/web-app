@@ -24,11 +24,10 @@ jobs:
         with:
           python-version: '3.11'  # Use your Python version
       
-      - name: Install Chrome and ChromeDriver
+      - name: Display Chrome and ChromeDriver Versions
         run: |
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable chromium-chromedriver
-          sudo ln -s /usr/lib/chromium-browser/chromedriver /usr/local/bin/chromedriver  # Link chromedriver to path
+          google-chrome --version
+          chromedriver --version
 
       - name: Install dependencies
         working-directory: ./frontend
