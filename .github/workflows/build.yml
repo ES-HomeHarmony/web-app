@@ -11,6 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      
       - name: see
         run: |
           pwd
@@ -19,12 +24,7 @@ jobs:
       - name: Move to the ./frontend directory
         run: |
           cd frontend
-
-      - name: Check out the code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-
+          
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
