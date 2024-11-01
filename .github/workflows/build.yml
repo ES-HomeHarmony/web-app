@@ -6,68 +6,55 @@ on:
       - dev
   pull_request:
     types: [opened, synchronize, reopened]
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-
       - name: Check out the code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      
-      - name: Move to the ./frontend directory
-        run: cd ./frontend
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'  # Use your Python version
+          python-version: '3.11'
 
       - name: Install dependencies
         working-directory: ./frontend
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt  # Adjust if requirements are in a different path
+          pip install -r requirements.txt
+          npm install  # Install frontend dependencies
 
-      - name: Start React Application
+      - name: Run Coverage for Behave Tests
         working-directory: ./frontend
         run: |
-          npm install
-          nohup npm start &  # Start React app in the background
-          sleep 20  # Wait for the app to start; adjust as needed
+          coverage run -m behave tests/LandingPage
+          coverage xml  # Generate coverage.xml for SonarCloud
 
-      - name: Run Tests LandingPage
-        working-directory: ./frontend/tests/LandingPage  # Adjust to the test directory
-        run: |
-          behave  # Runs Behave tests
-
-      # - name: Run Tests Login
-      #   working-directory: ./frontend/tests/Login  # Adjust to the test directory
-      #   run: |
-      #     behave  # Runs Behave tests
-
-      # - name: Run Tests SignUp
-      #   working-directory: ./frontend/tests/SignUp  # Adjust to the test directory
-      #   run: |
-      #     behave  # Runs Behave tests
-      
-      # - name: Run Tests UserProfileEdit
-      #   working-directory: ./frontend/tests/UserProfileEdit  # Adjust to the test directory
-      #   run: |
-      #     behave  # Runs Behave tests
-          
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
+
+      - name: Install dependencies for SonarCloud
+        working-directory: ./frontend
+        run: |
+          python -m pip install coverage  # Install coverage in Sonar job if needed
+          pip install -r requirements.txt
+          npm install
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
-            args: -Dsonar.projectBaseDir=./frontend
+          args: >
+            -Dsonar.projectBaseDir=./frontend
+            -Dsonar.python.coverage.reportPaths=frontend/coverage.xml
