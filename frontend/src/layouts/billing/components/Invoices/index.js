@@ -20,12 +20,19 @@ import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
+import Icon from "@mui/material/Icon";
 
 // Billing page components
 import Invoice from "layouts/billing/components/Invoice";
 import PropTypes from "prop-types";
 
-function Invoices({ invoices, selectedHouse }) {
+function Invoices({ invoices, selectedHouse, pdfUrl, onDetailsClick }) {
+  const openPdf = () => {
+    if (pdfUrl) {
+      window.open(pdfUrl, "_blank"); // Open the PDF in a new tab
+    }
+  };
+
   // Filter invoices based on the selected house
   const filteredInvoices = (invoices || []).filter((invoice) => invoice.house === selectedHouse);
 
@@ -35,21 +42,56 @@ function Invoices({ invoices, selectedHouse }) {
         <MDTypography variant="h6" fontWeight="medium">
           Expenses
         </MDTypography>
-        <MDButton variant="outlined" color="info" size="small">
-          view all
-        </MDButton>
       </MDBox>
       <MDBox p={2}>
         <MDBox component="ul" display="flex" flexDirection="column" p={0} m={0}>
           {filteredInvoices.map((invoice, index) => (
-            <Invoice
+            <MDBox
               key={index}
-              date={invoice.date}
-              expenseType={invoice.expenseType}
-              price={invoice.price}
-              file={invoice.file}
-              noGutter={index === filteredInvoices.length - 1}
-            />
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              p={1}
+              sx={{
+                border: "1px solid #e0e0e0",
+                borderRadius: "8px",
+                mb: 1,
+              }}
+            >
+              <MDBox display="flex" flexDirection="column">
+                <MDTypography variant="subtitle2" fontWeight="medium" color="text.primary">
+                  {invoice.expenseType}
+                </MDTypography>
+                <MDTypography variant="caption" color="error" mb={1}>
+                  {invoice.date}
+                </MDTypography>
+              </MDBox>
+              <MDBox display="flex" alignItems="center" gap={2}>
+                <MDTypography variant="body2" fontWeight="medium" color="warning" mr={1}>
+                  {invoice.price}
+                </MDTypography>
+                {invoice.file && (
+                  <MDTypography
+                    variant="button"
+                    display="flex"
+                    fontWeight="bold"
+                    alignItems="center"
+                    sx={{ cursor: "pointer" }}
+                    onClick={openPdf}
+                  >
+                    <Icon fontSize="small">picture_as_pdf</Icon> &nbsp;PDF
+                  </MDTypography>
+                )}
+                <MDButton
+                  variant="outlined"
+                  color="info"
+                  size="small"
+                  onClick={() => onDetailsClick(invoice.expenseType)}
+                >
+                  Details
+                </MDButton>
+              </MDBox>
+            </MDBox>
           ))}
         </MDBox>
       </MDBox>
@@ -58,16 +100,18 @@ function Invoices({ invoices, selectedHouse }) {
 }
 
 Invoices.propTypes = {
+  pdfUrl: PropTypes.string,
   invoices: PropTypes.arrayOf(
     PropTypes.shape({
       date: PropTypes.string.isRequired,
       expenseType: PropTypes.string.isRequired,
       price: PropTypes.string.isRequired,
       file: PropTypes.object,
-      house: PropTypes.string.isRequired, // Make sure to include the house property here
+      house: PropTypes.string.isRequired,
     })
   ).isRequired,
-  selectedHouse: PropTypes.string.isRequired, // Add this to prop types
+  selectedHouse: PropTypes.string.isRequired,
+  onDetailsClick: PropTypes.func.isRequired, // Ensure this is defined
 };
 
 export default Invoices;

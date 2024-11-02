@@ -20,6 +20,7 @@ import Footer from "examples/Footer";
 import Invoices from "layouts/billing/components/Invoices";
 import BillingInformation from "layouts/billing/components/BillingInformation";
 import Transactions from "layouts/billing/components/Transactions";
+import Payments from "layouts/billing/components/Payments";
 
 import axios from "axios";
 
@@ -27,9 +28,11 @@ function Billing() {
   const location = useLocation();
   const [selectedHouse, setSelectedHouse] = useState("");
   const [invoices, setInvoices] = useState([]);
+  const [selectedExpense, setSelectedExpense] = useState(null); // Add this state
 
   // Houses available
   const houses = ["House Aveiro", "House Lisbon", "House Porto"];
+  const tenants = ["Tenant 1", "Tenant 2", "Tenant 3"];
 
   // Set the selected house from location state
   useEffect(() => {
@@ -65,6 +68,29 @@ function Billing() {
     setInvoices([...invoices, newInvoice]);
   };
 
+  const tenants_invoices = [
+    {
+      date: "2024-11-01",
+      expenseType: "Water Bill",
+      price: "€50",
+      file: null,
+      house: "House Aveiro",
+      paidBy: ["Tenant 1"], // Only John has paid
+    },
+    {
+      date: "2024-11-15",
+      expenseType: "Electricity Bill",
+      price: "€75",
+      file: null,
+      house: "House Aveiro",
+      paidBy: [], // No one has paid yet
+    },
+  ];
+
+  const handleSelectExpense = (expenseType) => {
+    setSelectedExpense(expenseType); // Set the selected expense
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar absolute isMini />
@@ -97,12 +123,23 @@ function Billing() {
         <MDBox mb={3}>
           <Grid container spacing={3}>
             {/* Left side: Add Expenses Form */}
-            <Grid item xs={12} xl={6}>
+            <Grid item xs={12} xl={5}>
               <BillingInformation selectedHouse={selectedHouse} addInvoice={addInvoice} />
             </Grid>
             {/* Right side: Expenses List */}
-            <Grid item xs={12} xl={6}>
-              <Invoices invoices={invoices} selectedHouse={selectedHouse} />
+            <Grid item xs={12} xl={4}>
+              <Invoices
+                invoices={invoices}
+                selectedHouse={selectedHouse}
+                onDetailsClick={handleSelectExpense} // Pass the function here
+              />
+            </Grid>
+            <Grid item xs={12} xl={3}>
+              <Payments
+                invoices={tenants_invoices}
+                tenants={tenants}
+                selectedExpense={selectedExpense} // Pass the selected expense
+              />
             </Grid>
           </Grid>
         </MDBox>
