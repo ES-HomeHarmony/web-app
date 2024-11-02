@@ -19,9 +19,9 @@ export async function createHouse(houseData) {
 }
 
 // Função para buscar todas as casas associadas a um landlord específico
-export async function fetchHousesByLandlord(landlordId) {
+export async function fetchHousesByLandlord() {
   try {
-    const response = await axios.get(`${API_URL}/houses/landlord/${landlordId}`, {
+    const response = await axios.get(`${API_URL}/houses/landlord`, {
       withCredentials: true, // Inclui cookies de autenticação
     });
     return response.data; // Retorna os dados em JSON

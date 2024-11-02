@@ -20,15 +20,14 @@ function Dashboard() {
   const [userName, setUserName] = useState("");
   const [houses, setHouses] = useState([]);
 
-  const landlordId = "string"; // Defina o landlordId aqui ou obtenha-o dinamicamente, se necessário.
   const colors = ["primary", "info", "success", "warning", "error"]; // Array de cores alternadas
 
   function redirectToSignIn() {
-    window.location.href = "http://localhost:8000/auth/login";
+    window.location.href = "http://localhost:8001/auth/login";
   }
 
   async function redirectToLogout() {
-    window.location.href = "http://localhost:8000/auth/logout";
+    window.location.href = "http://localhost:8001/auth/logout";
   }
 
   const handleAddHouseClick = () => {
@@ -48,7 +47,7 @@ function Dashboard() {
 
       if (accessToken) {
         try {
-          const response = await axios.get("http://localhost:8000/user/profile", {
+          const response = await axios.get("http://localhost:8001/user/profile", {
             withCredentials: true,
           });
 
@@ -67,7 +66,7 @@ function Dashboard() {
 
     const fetchHouses = async () => {
       try {
-        const response = await landlordService.fetchHousesByLandlord(landlordId);
+        const response = await landlordService.fetchHousesByLandlord();
         setHouses(response);
       } catch (error) {
         console.error("Erro ao buscar casas:", error);
@@ -76,7 +75,7 @@ function Dashboard() {
 
     fetchUserProfile();
     fetchHouses();
-  }, [landlordId]);
+  }, []);
 
   return (
     <DashboardLayout>

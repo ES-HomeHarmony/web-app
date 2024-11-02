@@ -17,7 +17,6 @@ import MDInput from "components/MDInput";
 function Tables() {
   const [houseData, setHouseData] = useState({
     name: "",
-    landlord_id: "",
     address: "",
     city: "",
     state: "",
@@ -119,16 +118,6 @@ function Tables() {
                       label="Name"
                       name="name"
                       value={houseData.name}
-                      onChange={handleChange}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <MDInput
-                      type="text"
-                      label="Landlord"
-                      name="landlord_id"
-                      value={houseData.landlord_id}
                       onChange={handleChange}
                       fullWidth
                     />
