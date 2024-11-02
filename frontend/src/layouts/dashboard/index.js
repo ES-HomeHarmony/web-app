@@ -1,60 +1,40 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// @mui material components
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Grid from "@mui/material/Grid";
 
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-
-// Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
 import Invoices from "layouts/billing/components/Invoices";
-
-// Data
-import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
-
-// Dashboard components
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 
-import SignInButton from "../../components/SignInButton"; // Import the SignInButton
+import SignInButton from "../../components/SignInButton";
 import SignUpButton from "../../components/SignUpButton";
 import LogoutButton from "../../components/LogoutButton";
-
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { Logout } from "@mui/icons-material";
+import landlordService from "../../services/landlordService";
 
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
   const navigate = useNavigate(); // Hook to navigate programmatically
   const [logged, setLogged] = useState(false);
   const [userName, setUserName] = useState("");
+  const [houses, setHouses] = useState([]);
+
+  const colors = ["primary", "info", "success", "warning", "error"]; // Array de cores alternadas
 
   function redirectToSignIn() {
-    window.location.href = "http://localhost:8000/auth/login";
+    window.location.href = "http://localhost:8001/auth/login";
   }
 
   async function redirectToLogout() {
-    window.location.href = "http://localhost:8000/auth/logout";
+    window.location.href = "http://localhost:8001/auth/logout";
   }
+
+  const handleAddHouseClick = () => {
+    window.location.href = "/tables"; // Replace '/add-house' with your desired route
+  };
 
   useEffect(() => {
     const getAccessTokenFromCookies = () => {
@@ -69,12 +49,12 @@ function Dashboard() {
 
       if (accessToken) {
         try {
-          const response = await axios.get("http://localhost:8000/user/profile", {
-            withCredentials: true, // Include cookies in the request
+          const response = await axios.get("http://localhost:8001/user/profile", {
+            withCredentials: true,
           });
 
           if (response.data?.name) {
-            setUserName(response.data.name); // Set user's name
+            setUserName(response.data.name);
             setLogged(true);
           }
         } catch (error) {
@@ -82,10 +62,21 @@ function Dashboard() {
           setLogged(false);
         }
       } else {
-        setLogged(false); // No access token, so user is not logged in
+        setLogged(false);
       }
     };
+
+    const fetchHouses = async () => {
+      try {
+        const response = await landlordService.fetchHousesByLandlord();
+        setHouses(response);
+      } catch (error) {
+        console.error("Erro ao buscar casas:", error);
+      }
+    };
+
     fetchUserProfile();
+    fetchHouses();
   }, []);
 
   const handleAddHouseClick = () => {
@@ -101,12 +92,11 @@ function Dashboard() {
       <DashboardNavbar />
       <MDBox py={3}>
         <Grid container spacing={3}>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox
-              mb={1.5}
-              onClick={() => handleHouseClick("House Aveiro")}
-              style={{ cursor: "pointer" }}
-            >
+        {/* Renderizar casas do landlord com cores alternadas */}
+        {houses.map((house, index) => (
+          <Grid item xs={12} md={6} lg={3} key={index}> 
+            <MDBox mb={1.5} onClick={() => handleHouseClick("House Aveiro")}
+              style={{ cursor: "pointer" }}>
               <ComplexStatisticsCard
                 color="primary"
                 icon="house"
@@ -118,55 +108,25 @@ function Dashboard() {
               />
             </MDBox>
           </Grid>
+          ))}
+        
           <Grid item xs={12} md={6} lg={3}>
-            <MDBox
-              mb={1.5}
-              onClick={() => handleHouseClick("House Lisbon")}
-              style={{ cursor: "pointer" }}
-            >
-              <ComplexStatisticsCard
-                color="info"
-                icon="house"
-                title="Tenants"
-                count="9"
-                percentage={{
-                  amount: "House Lisbon",
-                }}
-              />
-            </MDBox>
-          </Grid>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox
-              mb={1.5}
-              onClick={() => handleHouseClick("House Porto")}
-              style={{ cursor: "pointer" }}
-            >
-              <ComplexStatisticsCard
-                color="warning"
-                icon="house"
-                title="Tenants"
-                count="4"
-                percentage={{
-                  amount: "House Porto",
-                }}
-              />
-            </MDBox>
-          </Grid>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5} onClick={handleAddHouseClick} style={{ cursor: "pointer" }}>
+            <MDBox mb={1.5}>
               <ComplexStatisticsCard
                 color="light"
                 icon="add"
-                title="‎ "
-                count="‎ "
+                title=" "
+                count=" "
                 percentage={{
                   label: "Add House",
                 }}
               />
             </MDBox>
           </Grid>
+
+          {/* Mensagem de boas-vindas e controle de login/logout */}
           <Grid item xs={12}>
-            <MDBox textAlign="center">
+            <MDBox textAlign="center" mt={3}>
               {logged ? (
                 <>
                   <h3>Welcome back {userName}!</h3>
@@ -175,13 +135,15 @@ function Dashboard() {
               ) : (
                 <div>
                   <h3>Please log in to access the dashboard features.</h3>
-                  <SignInButton onClick={redirectToSignIn} />{" "}
+                  <SignInButton onClick={redirectToSignIn} />
                   <SignUpButton onClick={redirectToSignIn} />
                 </div>
               )}
             </MDBox>
           </Grid>
         </Grid>
+
+        {/* Seções adicionais da dashboard */}
         <MDBox mt={4.5}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={8}>
