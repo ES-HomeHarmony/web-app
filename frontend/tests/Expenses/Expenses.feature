@@ -18,6 +18,6 @@ Feature: Landlord Addition of Expenses
 
   Scenario: Add new expense details
     Given that the landlord is adding a new expense
-    When the landlord inputs details such as amount, category, and payment deadline
+    When the landlord inputs details such as type, amount, payment deadline and file
     Then the expense is saved
-    And feedback is shown
+    And success feedback is shown
