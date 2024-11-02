@@ -89,7 +89,7 @@ function BillingInformation({ selectedHouse, addInvoice }) {
   return (
     <Card id="delete-account">
       <MDBox pt={3} px={2}>
-        <MDTypography variant="h6" fontWeight="medium">
+        <MDTypography id="select" variant="h6" fontWeight="medium">
           Add Expenses to {selectedHouse}
         </MDTypography>
       </MDBox>
@@ -104,6 +104,7 @@ function BillingInformation({ selectedHouse, addInvoice }) {
           m={0}
         >
           <TextField
+            id="type"
             fullWidth
             label="Expense Type"
             value={expenseType}
@@ -111,6 +112,7 @@ function BillingInformation({ selectedHouse, addInvoice }) {
             margin="normal"
           />
           <TextField
+            id="price"
             fullWidth
             label="Price"
             value={price}
@@ -118,6 +120,7 @@ function BillingInformation({ selectedHouse, addInvoice }) {
             margin="normal"
           />
           <TextField
+            id="deadline"
             fullWidth
             label="Deadline"
             type="date" // Change type to "date" for date picker
@@ -150,6 +153,7 @@ function BillingInformation({ selectedHouse, addInvoice }) {
             </MDBox>
           </label>
           <Button
+            id="save"
             variant="contained"
             color="primary"
             onClick={handleSubmit}
