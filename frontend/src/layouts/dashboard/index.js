@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Grid from "@mui/material/Grid";
 
@@ -14,6 +15,7 @@ import SignInButton from "../../components/SignInButton";
 import SignUpButton from "../../components/SignUpButton";
 import LogoutButton from "../../components/LogoutButton";
 import landlordService from "../../services/landlordService";
+import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
@@ -31,10 +33,6 @@ function Dashboard() {
   async function redirectToLogout() {
     window.location.href = "http://localhost:8001/auth/logout";
   }
-
-  const handleAddHouseClick = () => {
-    window.location.href = "/tables"; // Replace '/add-house' with your desired route
-  };
 
   useEffect(() => {
     const getAccessTokenFromCookies = () => {
@@ -92,26 +90,34 @@ function Dashboard() {
       <DashboardNavbar />
       <MDBox py={3}>
         <Grid container spacing={3}>
-        {/* Renderizar casas do landlord com cores alternadas */}
-        {houses.map((house, index) => (
-          <Grid item xs={12} md={6} lg={3} key={index}> 
-            <MDBox mb={1.5} onClick={() => handleHouseClick("House Aveiro")}
-              style={{ cursor: "pointer" }}>
-              <ComplexStatisticsCard
-                color="primary"
-                icon="house"
-                title="Tenants"
-                count={18}
-                percentage={{
-                  amount: "House Aveiro",
-                }}
-              />
-            </MDBox>
-          </Grid>
+          {/* Renderizar casas do landlord com cores alternadas */}
+          {houses.map((house, index) => (
+            <Grid item xs={12} md={6} lg={3} key={index}>
+              <MDBox
+                mb={1.5}
+                onClick={() => handleHouseClick("House Aveiro")}
+                style={{ cursor: "pointer" }}
+              >
+                <ComplexStatisticsCard
+                  color={colors[index % colors.length]} // Alterna entre as cores
+                  icon="house"
+                  title={house.name} // Nome da casa
+                  percentage={{
+                    amount: `${house.address},${house.city}, ${house.state}, ${house.zipcode}`,
+                  }}
+                />
+              </MDBox>
+            </Grid>
           ))}
-        
+
+          {/* Card para adicionar uma nova casa */}
           <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
+            <MDBox
+              mb={1.5}
+              onClick={handleAddHouseClick}
+              style={{ cursor: "pointer" }}
+              id="createHouse"
+            >
               <ComplexStatisticsCard
                 color="light"
                 icon="add"
