@@ -166,7 +166,6 @@ function Tables() {
               </MDBox>
             </Card>
           </Grid>
-
           {/* Tabela de Tenants */}
           <Grid item xs={12}>
             <Card>
@@ -194,7 +193,7 @@ function Tables() {
                 />
               </MDBox>
             </Card>
-          </Grid>
+          </Grid>{" "}
         </Grid>
 
         {/* Botões de Ação */}

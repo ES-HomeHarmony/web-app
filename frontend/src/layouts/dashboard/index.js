@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Grid from "@mui/material/Grid";
 
@@ -14,8 +15,11 @@ import SignInButton from "../../components/SignInButton";
 import SignUpButton from "../../components/SignUpButton";
 import LogoutButton from "../../components/LogoutButton";
 import landlordService from "../../services/landlordService";
+import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 
 function Dashboard() {
+  const { sales, tasks } = reportsLineChartData;
+  const navigate = useNavigate(); // Hook to navigate programmatically
   const [logged, setLogged] = useState(false);
   const [userName, setUserName] = useState("");
   const [houses, setHouses] = useState([]);
@@ -29,10 +33,6 @@ function Dashboard() {
   async function redirectToLogout() {
     window.location.href = "http://localhost:8001/auth/logout";
   }
-
-  const handleAddHouseClick = () => {
-    window.location.href = "/tables"; // Replace '/add-house' with your desired route
-  };
 
   useEffect(() => {
     const getAccessTokenFromCookies = () => {
@@ -77,6 +77,14 @@ function Dashboard() {
     fetchHouses();
   }, []);
 
+  const handleAddHouseClick = () => {
+    navigate("/tables"); // Replace '/add-house' with your desired route
+  };
+
+  const handleHouseClick = (houseName) => {
+    navigate("/billing", { state: { selectedHouse: houseName } }); // Pass the selected house name as state
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -85,7 +93,11 @@ function Dashboard() {
           {/* Renderizar casas do landlord com cores alternadas */}
           {houses.map((house, index) => (
             <Grid item xs={12} md={6} lg={3} key={index}>
-              <MDBox mb={1.5}>
+              <MDBox
+                mb={1.5}
+                onClick={() => handleHouseClick("House Aveiro")}
+                style={{ cursor: "pointer" }}
+              >
                 <ComplexStatisticsCard
                   color={colors[index % colors.length]} // Alterna entre as cores
                   icon="house"
