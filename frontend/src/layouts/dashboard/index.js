@@ -28,7 +28,7 @@ function Dashboard() {
   }
 
   async function redirectToLogout() {
-    window.location.href = "http://localhost:8000/auth/logout"; 
+    window.location.href = "http://localhost:8000/auth/logout";
   }
 
   const handleAddHouseClick = () => {
@@ -101,7 +101,12 @@ function Dashboard() {
 
           {/* Card para adicionar uma nova casa */}
           <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5} onClick={handleAddHouseClick} style={{ cursor: "pointer" }}>
+            <MDBox
+              mb={1.5}
+              onClick={handleAddHouseClick}
+              style={{ cursor: "pointer" }}
+              id="createHouse"
+            >
               <ComplexStatisticsCard
                 color="light"
                 icon="add"
