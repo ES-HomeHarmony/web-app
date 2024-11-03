@@ -1,55 +1,82 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
+import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import axios from "axios";
 
 // @mui material components
 import Card from "@mui/material/Card";
-// import Divider from "@mui/material/Divider";
-import Icon from "@mui/material/Icon";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-// import MDButton from "components/MDButton";
 
 // Billing page components
 import Transaction from "layouts/billing/components/Transaction";
 
-function Transactions() {
+function Transactions({ selectedHouse }) {
+  const [expenses, setExpenses] = useState([]);
+  const [sortOption, setSortOption] = useState("");
+  const [filterOption, setFilterOption] = useState("All");
+
+  // Fetch expenses when selectedHouse is defined
+  useEffect(() => {
+    if (selectedHouse) {
+      const fetchExpenses = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8000/houses/expenses/${selectedHouse.id}`
+          );
+          setExpenses(response.data);
+        } catch (error) {
+          console.error("Error fetching expenses:", error);
+        }
+      };
+      fetchExpenses();
+    }
+  }, [selectedHouse]);
+
+  // Handle sorting
+  const handleSortChange = (event) => {
+    setSortOption(event.target.value);
+  };
+
+  // Handle filtering
+  const handleFilterChange = (event) => {
+    setFilterOption(event.target.value);
+  };
+
+  // Sort and filter the transactions
+  const sortedFilteredExpenses = [...expenses]
+    .filter((transaction) => filterOption === "All" || transaction.type === filterOption)
+    .sort((a, b) => {
+      if (sortOption === "name") return a.title.localeCompare(b.title);
+      if (sortOption === "date") return new Date(b.created_at) - new Date(a.created_at);
+      if (sortOption === "type") return a.type.localeCompare(b.type);
+      return 0;
+    });
+
   return (
     <Card sx={{ height: "100%" }}>
       <MDBox display="flex" justifyContent="space-between" alignItems="center" pt={3} px={2}>
-        <MDTypography variant="h6" fontWeight="medium" textTransform="capitalize">
-          Your Transaction&apos;s
+        <MDTypography variant="h6" fontWeight="medium" textTransform="capitalize" color="primary">
+          Expenses
         </MDTypography>
-        <MDBox display="flex" alignItems="flex-start">
-          <MDBox color="text" mr={0.5} lineHeight={0}>
-            <Icon color="inherit" fontSize="small">
-              date_range
-            </Icon>
-          </MDBox>
-          <MDTypography variant="button" color="text" fontWeight="regular">
-            23 - 30 March 2020
-          </MDTypography>
+        <MDBox display="flex" alignItems="center">
+          <Select value={sortOption} onChange={handleSortChange} displayEmpty>
+            <MenuItem value="">Sort By</MenuItem>
+            <MenuItem value="name">File Name</MenuItem>
+            <MenuItem value="date">Upload Date</MenuItem>
+            <MenuItem value="type">Document Type</MenuItem>
+          </Select>
+          <Select value={filterOption} onChange={handleFilterChange} displayEmpty sx={{ ml: 2 }}>
+            <MenuItem value="All">All</MenuItem>
+            <MenuItem value="Utility">Utility</MenuItem>
+            <MenuItem value="Subscription">Subscription</MenuItem>
+          </Select>
         </MDBox>
       </MDBox>
       <MDBox pt={3} pb={2} px={2}>
-        <MDBox mb={2}>
-          <MDTypography variant="caption" color="text" fontWeight="bold" textTransform="uppercase">
-            newest
-          </MDTypography>
-        </MDBox>
         <MDBox
           component="ul"
           display="flex"
@@ -58,66 +85,27 @@ function Transactions() {
           m={0}
           sx={{ listStyle: "none" }}
         >
-          <Transaction
-            color="error"
-            icon="expand_more"
-            name="Netflix"
-            description="27 March 2020, at 12:30 PM"
-            value="- $ 2,500"
-          />
-          <Transaction
-            color="success"
-            icon="expand_less"
-            name="Apple"
-            description="27 March 2020, at 04:30 AM"
-            value="+ $ 2,000"
-          />
-        </MDBox>
-        <MDBox mt={1} mb={2}>
-          <MDTypography variant="caption" color="text" fontWeight="bold" textTransform="uppercase">
-            yesterday
-          </MDTypography>
-        </MDBox>
-        <MDBox
-          component="ul"
-          display="flex"
-          flexDirection="column"
-          p={0}
-          m={0}
-          sx={{ listStyle: "none" }}
-        >
-          <Transaction
-            color="success"
-            icon="expand_less"
-            name="Stripe"
-            description="26 March 2020, at 13:45 PM"
-            value="+ $ 750"
-          />
-          <Transaction
-            color="success"
-            icon="expand_less"
-            name="HubSpot"
-            description="26 March 2020, at 12:30 PM"
-            value="+ $ 1,000"
-          />
-          <Transaction
-            color="success"
-            icon="expand_less"
-            name="Creative Tim"
-            description="26 March 2020, at 08:30 AM"
-            value="+ $ 2,500"
-          />
-          <Transaction
-            color="dark"
-            icon="priority_high"
-            name="Webflow"
-            description="26 March 2020, at 05:00 AM"
-            value="Pending"
-          />
+          {sortedFilteredExpenses.map((expense) => (
+            <Transaction
+              key={expense.id}
+              color="success"
+              icon="picture_as_pdf"
+              name={expense.title}
+              description={expense.deadline_date} // Using deadline_date for description
+              value={`€${expense.amount}`} // Formatting amount with €
+              pdfUrl={expense.file_path || "#"} // Setting PDF URL or fallback
+            />
+          ))}
         </MDBox>
       </MDBox>
     </Card>
   );
 }
+
+Transactions.propTypes = {
+  selectedHouse: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+  }).isRequired,
+};
 
 export default Transactions;
