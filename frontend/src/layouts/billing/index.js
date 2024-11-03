@@ -21,6 +21,7 @@ function Billing() {
   const [houses, setHouses] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [selectedExpense, setSelectedExpense] = useState(null);
+  const [tenants, setTenants] = useState([]); // New state for tenants
 
   // Fetch the list of houses when the component mounts
   useEffect(() => {
@@ -56,8 +57,18 @@ function Billing() {
     setInvoices([...invoices, newInvoice]);
   };
 
-  const handleSelectExpense = (expenseType) => {
-    setSelectedExpense(expenseType);
+  const handleSelectExpense = async (expenseId) => {
+    setSelectedExpense(expenseId);
+    try {
+      const response = await axios.get(`http://localhost:8000/houses/expense/${expenseId}`);
+      if (response.data && response.data.tenants) {
+        setTenants(response.data.tenants); // Set tenants for the selected expense
+      } else {
+        console.warn("No tenant data received for the selected expense");
+      }
+    } catch (error) {
+      console.error("Error fetching tenant payment status:", error);
+    }
   };
 
   return (
@@ -71,13 +82,16 @@ function Billing() {
                 <FormControl fullWidth variant="outlined">
                   <InputLabel>Select House</InputLabel>
                   <Select
-                    value={selectedHouse}
-                    onChange={(e) => setSelectedHouse(e.target.value)}
+                    value={selectedHouse?.id || ""} // Use the `id` or a unique identifier
+                    onChange={(e) => {
+                      const selected = houses.find((house) => house.id === e.target.value);
+                      setSelectedHouse(selected || {}); // Set the selected house object
+                    }}
                     label="Select House"
                   >
                     {houses.map((house) => (
-                      <MenuItem key={house.id} value={house.name}>
-                        {house.name}
+                      <MenuItem key={house.id} value={house.id}>
+                        {house.name} {/* Ensure this is rendering a string */}
                       </MenuItem>
                     ))}
                   </Select>
@@ -99,7 +113,7 @@ function Billing() {
               />
             </Grid>
             <Grid item xs={12} xl={3}>
-              <Payments invoices={invoices} tenants={[]} selectedExpense={selectedExpense} />
+              <Payments tenants={tenants} selectedExpense={selectedExpense} />
             </Grid>
           </Grid>
         </MDBox>

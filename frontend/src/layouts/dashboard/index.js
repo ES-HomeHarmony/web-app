@@ -81,8 +81,8 @@ function Dashboard() {
     navigate("/tables"); // Replace '/add-house' with your desired route
   };
 
-  const handleHouseClick = (houseName) => {
-    navigate("/billing", { state: { selectedHouse: houseName } });
+  const handleHouseClick = (house) => {
+    navigate("/billing", { state: { selectedHouse: house } });
   };
   return (
     <DashboardLayout>
@@ -94,7 +94,7 @@ function Dashboard() {
             <Grid item xs={12} md={6} lg={3} key={index}>
               <MDBox
                 mb={1.5}
-                onClick={() => handleHouseClick(house.name)} // Pass the actual name of the house
+                onClick={() => handleHouseClick(house)} // Pass the actual name of the house
                 style={{ cursor: "pointer" }}
               >
                 <ComplexStatisticsCard

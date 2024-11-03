@@ -1,20 +1,7 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// @mui material components
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Card from "@mui/material/Card";
+import PropTypes from "prop-types";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -22,19 +9,68 @@ import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import Icon from "@mui/material/Icon";
 
-// Billing page components
-import Invoice from "layouts/billing/components/Invoice";
-import PropTypes from "prop-types";
+function Invoices({ selectedHouse, onDetailsClick }) {
+  const [expenses, setExpenses] = useState([]);
+  const [tenants, setTenants] = useState([]);
 
-function Invoices({ invoices, selectedHouse, pdfUrl, onDetailsClick }) {
-  const openPdf = () => {
-    if (pdfUrl) {
-      window.open(pdfUrl, "_blank"); // Open the PDF in a new tab
+  const openPdf = (url) => {
+    if (url) {
+      window.open(url, "_blank"); // Open the PDF in a new tab
     }
   };
 
-  // Filter invoices based on the selected house
-  const filteredInvoices = (invoices || []).filter((invoice) => invoice.house === selectedHouse);
+  // Fetch expenses based on the selected house
+  useEffect(() => {
+    if (selectedHouse && selectedHouse.id) {
+      const fetchExpenses = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8000/houses/expenses/${selectedHouse.id}`
+          );
+          const pendingExpenses = response.data.filter((expense) => expense.status !== "paid");
+          setExpenses(pendingExpenses);
+        } catch (error) {
+          console.error("Error fetching expenses:", error);
+        }
+      };
+      fetchExpenses();
+    }
+  }, [selectedHouse]);
+
+  const handleDetailsClick = async (expenseId) => {
+    try {
+      // Fetch tenant payment statuses for the selected expense
+      const response = await axios.get(`http://localhost:8000/houses/expense/${expenseId}`);
+
+      console.log("Tenant data for expense:", response.data); // Debug line
+
+      if (response.data && response.data.tenants) {
+        console.log("Tenants:", response.data.tenants); // Debug line
+        setTenants(response.data.tenants); // Display tenant payment statuses
+        const allPaid = response.data.tenants.every((tenant) => tenant.status === "paid");
+
+        if (allPaid) {
+          // Update the status of the expense to 'paid'
+          await axios.put(`http://localhost:8000/houses/expenses/${expenseId}/mark-paid`);
+        }
+      } else {
+        console.warn("No tenant data received for the selected expense");
+      }
+
+      // Refresh invoices to reflect any changes
+      const updatedInvoicesResponse = await axios.get(
+        `http://localhost:8000/houses/expenses/${selectedHouse.id}`
+      );
+      const pendingExpenses = updatedInvoicesResponse.data.filter(
+        (expense) => expense.status !== "paid"
+      );
+      setExpenses(pendingExpenses);
+
+      onDetailsClick(expenseId); // Pass expenseId for tracking
+    } catch (error) {
+      console.error("Error fetching tenant payment status or updating expense:", error);
+    }
+  };
 
   return (
     <Card sx={{ height: "100%" }}>
@@ -45,7 +81,7 @@ function Invoices({ invoices, selectedHouse, pdfUrl, onDetailsClick }) {
       </MDBox>
       <MDBox p={2}>
         <MDBox component="ul" display="flex" flexDirection="column" p={0} m={0}>
-          {filteredInvoices.map((invoice, index) => (
+          {expenses.map((expense, index) => (
             <MDBox
               key={index}
               display="flex"
@@ -60,33 +96,36 @@ function Invoices({ invoices, selectedHouse, pdfUrl, onDetailsClick }) {
             >
               <MDBox display="flex" flexDirection="column">
                 <MDTypography variant="subtitle2" fontWeight="medium" color="text.primary">
-                  {invoice.expenseType}
+                  {expense.title}
                 </MDTypography>
                 <MDTypography variant="caption" color="error" mb={1}>
-                  {invoice.date}
+                  {expense.created_at}
                 </MDTypography>
               </MDBox>
               <MDBox display="flex" alignItems="center" gap={2}>
                 <MDTypography variant="body2" fontWeight="medium" color="warning" mr={1}>
-                  {invoice.price}
+                  €{expense.amount}
                 </MDTypography>
-                {invoice.file && (
+                {expense.file_path && (
                   <MDTypography
                     variant="button"
                     display="flex"
                     fontWeight="bold"
                     alignItems="center"
                     sx={{ cursor: "pointer" }}
-                    onClick={openPdf}
+                    onClick={() => openPdf(expense.file_path)}
                   >
-                    <Icon fontSize="small">picture_as_pdf</Icon> &nbsp;PDF
+                    <Icon fontSize="small">picture_as_pdf</Icon>
+                    <MDTypography variant="button" fontWeight="bold">
+                      &nbsp;PDF
+                    </MDTypography>
                   </MDTypography>
                 )}
                 <MDButton
                   variant="outlined"
                   color="info"
                   size="small"
-                  onClick={() => onDetailsClick(invoice.expenseType)}
+                  onClick={() => handleDetailsClick(expense.id)}
                 >
                   Details
                 </MDButton>
@@ -99,19 +138,18 @@ function Invoices({ invoices, selectedHouse, pdfUrl, onDetailsClick }) {
   );
 }
 
+Invoices.defaultProps = {
+  pdfUrl: "",
+};
+
 Invoices.propTypes = {
   pdfUrl: PropTypes.string,
-  invoices: PropTypes.arrayOf(
-    PropTypes.shape({
-      date: PropTypes.string.isRequired,
-      expenseType: PropTypes.string.isRequired,
-      price: PropTypes.string.isRequired,
-      file: PropTypes.object,
-      house: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-  selectedHouse: PropTypes.string.isRequired,
-  onDetailsClick: PropTypes.func.isRequired, // Ensure this is defined
+  selectedHouse: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    name: PropTypes.string,
+    landlord_id: PropTypes.string,
+  }).isRequired,
+  onDetailsClick: PropTypes.func.isRequired,
 };
 
 export default Invoices;
