@@ -13,10 +13,14 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
+import { useState } from "react";
+
 // @mui material components
 import Card from "@mui/material/Card";
 // import Divider from "@mui/material/Divider";
-import Icon from "@mui/material/Icon";
+
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -26,30 +30,69 @@ import MDTypography from "components/MDTypography";
 // Billing page components
 import Transaction from "layouts/billing/components/Transaction";
 
+// Sample static data
+const transactionData = [
+  {
+    name: "Electricity Bill",
+    description: "27 March 2020, 12:30 PM",
+    value: "- $100",
+    type: "Utility",
+  },
+  { name: "Water Bill", description: "26 March 2020, 10:00 AM", value: "- $30", type: "Utility" },
+  { name: "Gas Bill", description: "25 March 2020, 9:15 AM", value: "- $50", type: "Utility" },
+  {
+    name: "Internet Bill",
+    description: "25 March 2020, 8:45 AM",
+    value: "- $45",
+    type: "Subscription",
+  },
+];
+
 function Transactions() {
+  const [sortOption, setSortOption] = useState("");
+  const [filterOption, setFilterOption] = useState("All");
+
+  // Handle sorting
+  const handleSortChange = (event) => {
+    setSortOption(event.target.value);
+  };
+
+  // Handle filtering
+  const handleFilterChange = (event) => {
+    setFilterOption(event.target.value);
+  };
+
+  // Sort and filter the transactions based on user selection
+  const sortedFilteredTransactions = [...transactionData]
+    .filter((transaction) => filterOption === "All" || transaction.type === filterOption)
+    .sort((a, b) => {
+      if (sortOption === "name") return a.name.localeCompare(b.name);
+      if (sortOption === "date") return new Date(b.description) - new Date(a.description);
+      if (sortOption === "type") return a.type.localeCompare(b.type);
+      return 0;
+    });
+
   return (
     <Card sx={{ height: "100%" }}>
       <MDBox display="flex" justifyContent="space-between" alignItems="center" pt={3} px={2}>
         <MDTypography variant="h6" fontWeight="medium" textTransform="capitalize">
-          Your Transaction&apos;s
+          Your Transactions
         </MDTypography>
-        <MDBox display="flex" alignItems="flex-start">
-          <MDBox color="text" mr={0.5} lineHeight={0}>
-            <Icon color="inherit" fontSize="small">
-              date_range
-            </Icon>
-          </MDBox>
-          <MDTypography variant="button" color="text" fontWeight="regular">
-            23 - 30 March 2020
-          </MDTypography>
+        <MDBox display="flex" alignItems="center">
+          <Select value={sortOption} onChange={handleSortChange} displayEmpty>
+            <MenuItem value="">Sort By</MenuItem>
+            <MenuItem value="name">File Name</MenuItem>
+            <MenuItem value="date">Upload Date</MenuItem>
+            <MenuItem value="type">Document Type</MenuItem>
+          </Select>
+          <Select value={filterOption} onChange={handleFilterChange} displayEmpty sx={{ ml: 2 }}>
+            <MenuItem value="All">All</MenuItem>
+            <MenuItem value="Utility">Utility</MenuItem>
+            <MenuItem value="Subscription">Subscription</MenuItem>
+          </Select>
         </MDBox>
       </MDBox>
       <MDBox pt={3} pb={2} px={2}>
-        <MDBox mb={2}>
-          <MDTypography variant="caption" color="text" fontWeight="bold" textTransform="uppercase">
-            newest
-          </MDTypography>
-        </MDBox>
         <MDBox
           component="ul"
           display="flex"
@@ -58,62 +101,16 @@ function Transactions() {
           m={0}
           sx={{ listStyle: "none" }}
         >
-          <Transaction
-            color="error"
-            icon="expand_more"
-            name="Netflix"
-            description="27 March 2020, at 12:30 PM"
-            value="- $ 2,500"
-          />
-          <Transaction
-            color="success"
-            icon="expand_less"
-            name="Apple"
-            description="27 March 2020, at 04:30 AM"
-            value="+ $ 2,000"
-          />
-        </MDBox>
-        <MDBox mt={1} mb={2}>
-          <MDTypography variant="caption" color="text" fontWeight="bold" textTransform="uppercase">
-            yesterday
-          </MDTypography>
-        </MDBox>
-        <MDBox
-          component="ul"
-          display="flex"
-          flexDirection="column"
-          p={0}
-          m={0}
-          sx={{ listStyle: "none" }}
-        >
-          <Transaction
-            color="success"
-            icon="expand_less"
-            name="Stripe"
-            description="26 March 2020, at 13:45 PM"
-            value="+ $ 750"
-          />
-          <Transaction
-            color="success"
-            icon="expand_less"
-            name="HubSpot"
-            description="26 March 2020, at 12:30 PM"
-            value="+ $ 1,000"
-          />
-          <Transaction
-            color="success"
-            icon="expand_less"
-            name="Creative Tim"
-            description="26 March 2020, at 08:30 AM"
-            value="+ $ 2,500"
-          />
-          <Transaction
-            color="dark"
-            icon="priority_high"
-            name="Webflow"
-            description="26 March 2020, at 05:00 AM"
-            value="Pending"
-          />
+          {sortedFilteredTransactions.map((transaction) => (
+            <Transaction
+              key={transaction.name}
+              color="success"
+              icon="expand_less"
+              name={transaction.name}
+              description={transaction.description}
+              value={transaction.value}
+            />
+          ))}
         </MDBox>
       </MDBox>
     </Card>

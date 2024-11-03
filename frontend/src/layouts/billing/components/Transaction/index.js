@@ -43,9 +43,23 @@ function Transaction({ color, icon, name, description, value }) {
             </MDTypography>
           </MDBox>
         </MDBox>
-        <MDTypography variant="button" color={color} fontWeight="medium" textGradient>
-          {value}
-        </MDTypography>
+        <MDBox display="flex" alignItems="center">
+          <MDTypography variant="button" color={color} fontWeight="medium" textGradient>
+            {value}
+          </MDTypography>
+          <MDButton
+            variant="outlined"
+            color="primary"
+            iconOnly
+            circular
+            component="a"
+            href="#"
+            download
+            sx={{ ml: 2 }}
+          >
+            <Icon>picture_as_pdf</Icon>
+          </MDButton>
+        </MDBox>
       </MDBox>
     </MDBox>
   );
