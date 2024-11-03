@@ -56,9 +56,9 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Tables",
+    name: "Add House",
     key: "tables",
-    icon: <Icon fontSize="small">table_view</Icon>,
+    icon: <Icon fontSize="small">house</Icon>,
     route: "/tables",
     component: <Tables />,
   },
