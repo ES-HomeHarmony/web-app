@@ -90,7 +90,7 @@ function BillingInformation({ selectedHouse, addInvoice }) {
     <Card id="delete-account">
       <MDBox pt={3} px={2}>
         <MDTypography id="select" variant="h6" fontWeight="medium">
-          Add Expenses to {selectedHouse}
+          Add Expenses to {selectedHouse.name}
         </MDTypography>
       </MDBox>
       <MDBox pt={1} pb={2} px={2}>
