@@ -82,9 +82,8 @@ function Dashboard() {
   };
 
   const handleHouseClick = (houseName) => {
-    navigate("/billing", { state: { selectedHouse: houseName } }); // Pass the selected house name as state
+    navigate("/billing", { state: { selectedHouse: houseName } });
   };
-
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -95,7 +94,7 @@ function Dashboard() {
             <Grid item xs={12} md={6} lg={3} key={index}>
               <MDBox
                 mb={1.5}
-                onClick={() => handleHouseClick("House Aveiro")}
+                onClick={() => handleHouseClick(house.name)} // Pass the actual name of the house
                 style={{ cursor: "pointer" }}
               >
                 <ComplexStatisticsCard
