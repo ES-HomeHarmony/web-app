@@ -27,13 +27,13 @@ import PropTypes from "prop-types";
 
 function Invoices({ invoices, selectedHouse }) {
   // Filter invoices based on the selected house
-  const filteredInvoices = (invoices || []).filter((invoice) => invoice.house === selectedHouse);
+  const filteredInvoices = (invoices || []).filter((invoice) => invoice.house === selectedHouse.id);
 
   return (
     <Card sx={{ height: "100%" }}>
       <MDBox pt={2} px={2} display="flex" justifyContent="space-between" alignItems="center">
         <MDTypography variant="h6" fontWeight="medium">
-          Expenses
+          Expenses History
         </MDTypography>
         <MDButton variant="outlined" color="info" size="small">
           view all
@@ -64,10 +64,13 @@ Invoices.propTypes = {
       expenseType: PropTypes.string.isRequired,
       price: PropTypes.string.isRequired,
       file: PropTypes.object,
-      house: PropTypes.string.isRequired, // Make sure to include the house property here
+      house: PropTypes.string.isRequired,
     })
   ).isRequired,
-  selectedHouse: PropTypes.string.isRequired, // Add this to prop types
+  selectedHouse: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default Invoices;

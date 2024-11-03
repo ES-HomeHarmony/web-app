@@ -15,6 +15,8 @@ function BillingInformation({ selectedHouse, addInvoice }) {
   const [deadline, setDeadline] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
 
+  console.log(selectedHouse);
+
   const handleSubmit = () => {
     if (!selectedHouse) {
       toast.error("Please select a house.");
