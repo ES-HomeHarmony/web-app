@@ -34,13 +34,13 @@ function Invoices({ invoices, selectedHouse, pdfUrl, onDetailsClick }) {
   };
 
   // Filter invoices based on the selected house
-  const filteredInvoices = (invoices || []).filter((invoice) => invoice.house === selectedHouse.id);
+  const filteredInvoices = (invoices || []).filter((invoice) => invoice.house === selectedHouse);
 
   return (
     <Card sx={{ height: "100%" }}>
       <MDBox pt={2} px={2} display="flex" justifyContent="space-between" alignItems="center">
         <MDTypography variant="h6" fontWeight="medium">
-          Expenses History
+          Expenses
         </MDTypography>
       </MDBox>
       <MDBox p={2}>
@@ -110,10 +110,8 @@ Invoices.propTypes = {
       house: PropTypes.string.isRequired,
     })
   ).isRequired,
-  selectedHouse: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-  }).isRequired,
+  selectedHouse: PropTypes.string.isRequired,
+  onDetailsClick: PropTypes.func.isRequired, // Ensure this is defined
 };
 
 export default Invoices;

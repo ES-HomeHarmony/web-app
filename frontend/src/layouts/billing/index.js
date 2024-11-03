@@ -15,8 +15,6 @@ import BillingInformation from "layouts/billing/components/BillingInformation";
 import Transactions from "layouts/billing/components/Transactions";
 import Payments from "layouts/billing/components/Payments";
 
-import axios from "axios";
-
 function Billing() {
   const location = useLocation();
   const [selectedHouse, setSelectedHouse] = useState("");
@@ -73,15 +71,12 @@ function Billing() {
                 <FormControl fullWidth variant="outlined">
                   <InputLabel>Select House</InputLabel>
                   <Select
-                    value={selectedHouse.id || ""}
-                    onChange={(e) => {
-                      const selected = houses.find((house) => house.id === e.target.value);
-                      setSelectedHouse(selected || {});
-                    }}
+                    value={selectedHouse}
+                    onChange={(e) => setSelectedHouse(e.target.value)}
                     label="Select House"
                   >
                     {houses.map((house) => (
-                      <MenuItem key={house.id} value={house.id}>
+                      <MenuItem key={house.id} value={house.name}>
                         {house.name}
                       </MenuItem>
                     ))}
@@ -94,10 +89,14 @@ function Billing() {
         <MDBox mb={3}>
           <Grid container spacing={3}>
             <Grid item xs={12} xl={5}>
-              <BillingInformation selectedHouse={selectedHouse.name} addInvoice={addInvoice} />
+              <BillingInformation selectedHouse={selectedHouse} addInvoice={addInvoice} />
             </Grid>
             <Grid item xs={12} xl={4}>
-              <Transactions selectedHouse={selectedHouse} />
+              <Invoices
+                invoices={invoices}
+                selectedHouse={selectedHouse}
+                onDetailsClick={handleSelectExpense}
+              />
             </Grid>
             <Grid item xs={12} xl={3}>
               <Payments invoices={invoices} tenants={[]} selectedExpense={selectedExpense} />
@@ -106,12 +105,8 @@ function Billing() {
         </MDBox>
         <MDBox mb={3}>
           <Grid container spacing={3}>
-            <Grid item xs={12} xl={4}>
-              <Invoices
-                invoices={invoices}
-                selectedHouse={selectedHouse}
-                onDetailsClick={handleSelectExpense}
-              />
+            <Grid item xs={12} md={5}>
+              <Transactions />
             </Grid>
           </Grid>
         </MDBox>
