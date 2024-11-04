@@ -120,7 +120,7 @@ function Billing() {
         <MDBox mb={3}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={5}>
-              <Transactions />
+              <Transactions selectedHouse={selectedHouse} />
             </Grid>
           </Grid>
         </MDBox>
