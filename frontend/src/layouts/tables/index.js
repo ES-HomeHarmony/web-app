@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 
@@ -13,6 +13,7 @@ import DataTable from "examples/Tables/DataTable";
 
 import landlordService from "services/landlordService";
 import MDInput from "components/MDInput";
+import { ToastContainer, toast } from "react-toastify";
 
 function Tables() {
   const [houseData, setHouseData] = useState({
@@ -24,41 +25,15 @@ function Tables() {
   });
 
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const tenantColumns = [
-    { Header: "Nome", accessor: "name", align: "left" },
-    { Header: "Email", accessor: "email", align: "left" },
-    { Header: "Telefone", accessor: "phone", align: "center" },
-    { Header: "Endereço", accessor: "address", align: "center" },
-    { Header: "Ações", accessor: "action", align: "center" },
-  ];
-
-  const tenantsData = [
-    {
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "123-456-7890",
-      address: "123 Main St",
-    },
-    {
-      name: "Jane Smith",
-      email: "jane@example.com",
-      phone: "098-765-4321",
-      address: "456 Maple Ave",
-    },
-  ];
-
-  const tenantRows = tenantsData.map((tenant) => ({
-    name: tenant.name,
-    email: tenant.email,
-    phone: tenant.phone,
-    address: tenant.address,
-    action: (
-      <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
-        Ver Perfil
-      </MDTypography>
-    ),
-  }));
+  // If state is passed when navigating, use it to pre-populate houseData
+  useEffect(() => {
+    if (location.state && location.state.house) {
+      setHouseData(location.state.house);
+      toast.info(`Adding tenants for: ${location.state.house.name}`);
+    }
+  }, [location.state]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -71,15 +46,29 @@ function Tables() {
   const handleSubmit = async (e) => {
     e.preventDefault(); // Previne o comportamento padrão do formulário
 
+    if (
+      !houseData.name ||
+      !houseData.address ||
+      !houseData.city ||
+      !houseData.state ||
+      !houseData.zipcode
+    ) {
+      toast.error("Please fill in all fields to create a house!"); // Mostra uma notificação de erro
+      return;
+    }
+
     try {
       const newHouse = await landlordService.createHouse(houseData);
       console.log("Resposta da API após criação:", newHouse); // Verifica se há uma resposta
 
       if (newHouse) {
         // Tente redirecionar com window.location.href
+        toast.success("House created successfully!"); // Mostra uma notificação de sucesso
+        setTimeout(() => {}, 2000);
         navigate("/dashboard");
       }
     } catch (error) {
+      toast.error("Failed to create house. Please try again."); // Mostra uma notificação de erro
       console.error("Erro ao criar a casa:", error);
     }
   };
@@ -166,34 +155,6 @@ function Tables() {
               </MDBox>
             </Card>
           </Grid>
-          {/* Tabela de Tenants */}
-          <Grid item xs={12}>
-            <Card>
-              <MDBox
-                mx={2}
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="info"
-                borderRadius="lg"
-                coloredShadow="info"
-              >
-                <MDTypography variant="h6" color="white">
-                  Tabela de Inquilinos
-                </MDTypography>
-              </MDBox>
-              <MDBox pt={3}>
-                <DataTable
-                  table={{ columns: tenantColumns, rows: tenantRows }}
-                  isSorted={false}
-                  entriesPerPage={false}
-                  showTotalEntries={false}
-                  noEndBorder
-                />
-              </MDBox>
-            </Card>
-          </Grid>{" "}
         </Grid>
 
         {/* Botões de Ação */}
@@ -206,6 +167,10 @@ function Tables() {
           </MDButton>
         </MDBox>
       </MDBox>
+      <div>
+        {/* Your existing code */}
+        <ToastContainer />
+      </div>
       <Footer />
     </DashboardLayout>
   );

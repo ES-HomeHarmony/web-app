@@ -20,6 +20,7 @@ import PropTypes from "prop-types";
 import Card from "@mui/material/Card";
 import Divider from "@mui/material/Divider";
 import Icon from "@mui/material/Icon";
+import Button from "@mui/material/Button";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
