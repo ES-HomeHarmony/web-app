@@ -81,6 +81,7 @@ Payments.propTypes = {
     })
   ).isRequired,
   selectedExpense: PropTypes.string, // Selected expense ID or identifier
+
 };
 
 export default Payments;
