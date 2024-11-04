@@ -6,7 +6,6 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import MDBox from "components/MDBox";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
@@ -61,7 +60,6 @@ function Billing() {
     gap: "10px",
     width: "100%",
   };
-  
   // Fetch the list of houses when the component mounts
   useEffect(() => {
     const fetchHouses = async () => {
@@ -84,7 +82,7 @@ function Billing() {
       setSelectedHouse(location.state.selectedHouse);
     }
   }, [location.state]);
-  
+
   useEffect(() => {
     const fetchTenants = async () => {
       if (houseSelected) {
@@ -108,7 +106,7 @@ function Billing() {
 
     fetchTenants();
   }, [houseSelected]);
-  
+
   const addInvoice = (expenseType, price, deadline, file) => {
     const newInvoice = {
       date: deadline,
@@ -131,13 +129,11 @@ function Billing() {
       }
     } catch (error) {
       console.error("Error fetching tenant payment status:", error);
+    }
+  };
 
   const handleAddTenants = () => {
-    if (houseSelected === false) {
-      toast.error("Please select a house first.");
-    } else {
-      setIsModalOpen(true);
-    }
+    setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
@@ -156,6 +152,8 @@ function Billing() {
       name: tenantData.name,
       email: tenantData.email,
     };
+
+    console.log(new_tenant);
 
     try {
       const response = await axios.post("http://localhost:8000/houses/tenents", new_tenant, {
@@ -185,7 +183,7 @@ function Billing() {
                     value={selectedHouse?.id || ""} // Use the `id` or a unique identifier
                     onChange={(e) => {
                       const selected = houses.find((house) => house.id === e.target.value);
-                      setSelectedHouse(selected || {}); // Set the selected house object
+                      setSelectedHouse(selected || {});
                     }}
                     label="Select House"
                   >
@@ -197,6 +195,7 @@ function Billing() {
                   </Select>
                 </FormControl>
               </Grid>
+            </Grid>
             <Grid item xs={12} md={6} lg={4} style={{ flex: 1 }}>
               <Button
                 variant="contained"
