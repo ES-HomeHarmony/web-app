@@ -39,6 +39,7 @@ Coded by www.creative-tim.com
 import Dashboard from "layouts/dashboard";
 import Tables from "layouts/tables";
 import Billing from "layouts/billing";
+import Contracts from "layouts/contracts";
 import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 
@@ -69,6 +70,14 @@ const routes = [
     icon: <Icon fontSize="small">receipt_long</Icon>,
     route: "/billing",
     component: <Billing />,
+  },
+  {
+    type: "collapse",
+    name: "Contracts",
+    key: "contracts",
+    icon: <Icon fontSize="small">receipt_long</Icon>,
+    route: "/contracts",
+    component: <Contracts />,
   },
   {
     type: "collapse",
