@@ -153,7 +153,7 @@ function BillingInformation({ tenants, selectedHouse }) {
             >
               <Icon fontSize="small">picture_as_pdf</Icon>
               <MDTypography variant="button" fontWeight="bold">
-                &nbsp;{selectedFile ? selectedFile.name : "Upload File (PDF, JPEG, PNG)"}
+                &nbsp;{selectedFile ? selectedFile.name : "Upload File (PDF, JPEG, PNG) (Max 5MB)"}
               </MDTypography>
             </MDBox>
           </label>

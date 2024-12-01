@@ -142,7 +142,9 @@ function Billing() {
                 {selectedHouse &&
                   tenants.map((tenant) => (
                     <MDBox key={tenant.id} mb={2}>
-                      <MDTypography variant="h6">{tenant.name}</MDTypography>
+                      <MDTypography id="tenants_info" variant="h6">
+                        {tenant.name}
+                      </MDTypography>
                       <MDTypography variant="body2" color="textSecondary">
                         {tenant.email}
                       </MDTypography>
