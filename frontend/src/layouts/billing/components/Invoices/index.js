@@ -13,9 +13,24 @@ function Invoices({ selectedHouse, onDetailsClick }) {
   const [expenses, setExpenses] = useState([]);
   const [tenants, setTenants] = useState([]);
 
-  const openPdf = (url) => {
-    if (url) {
-      window.open(url, "_blank"); // Open the PDF in a new tab
+  const openPdf = async (expenseId) => {
+    try {
+      // Faz a requisição para o backend
+      const response = await axios.get(
+        `http://localhost:8000/houses/expenses/${expenseId}/download`,
+        { responseType: "arraybuffer" } // Recebe o arquivo como arraybuffer
+      );
+
+      // Cria uma URL temporária para o arquivo PDF
+      const url = window.URL.createObjectURL(
+        new Blob([response.data], { type: "application/pdf" })
+      );
+
+      // Abre a URL em uma nova aba
+      window.open(url, "_blank");
+    } catch (error) {
+      console.error("Error fetching the PDF:", error);
+      alert("Error fetching the PDF");
     }
   };
 
@@ -113,7 +128,7 @@ function Invoices({ selectedHouse, onDetailsClick }) {
                     fontWeight="bold"
                     alignItems="center"
                     sx={{ cursor: "pointer" }}
-                    onClick={() => openPdf(expense.file_path)}
+                    onClick={() => openPdf(expense.id)}
                   >
                     <Icon fontSize="small">picture_as_pdf</Icon>
                     <MDTypography variant="button" fontWeight="bold">
