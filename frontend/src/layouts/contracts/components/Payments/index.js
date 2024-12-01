@@ -7,19 +7,22 @@ import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import MDButton from "components/MDButton";
 import { useEffect, useState } from "react";
 
-function Payments({ tenants = [], selectedExpense }) {
+function Payments({ tenants = [] }) {
   const [tenantContracts, setTenantContracts] = useState([]);
 
   useEffect(() => {
     if (tenants.length > 0) {
-      // Extract contract information directly from tenants
-      console.log("Tenants:", tenants); // Debug line
-      const formattedContracts = tenants.map((tenant) => ({
-        tenantName: tenant.name,
-        contractUrl: tenant.contarct, // Assuming `contract` contains the file URL
-      }));
+      console.log("Tenants received in Payments component:", tenants); // Debug tenants data
+      const formattedContracts = tenants
+        .filter((tenant) => tenant.contract) // Only include tenants with contracts
+        .map((tenant) => ({
+          tenantName: tenant.name,
+          contractUrl: tenant.contract, // Ensure this matches your backend response
+        }));
+      console.log("Formatted contracts:", formattedContracts); // Debug formatted contracts
       setTenantContracts(formattedContracts);
     } else {
+      console.log("No tenants provided to Payments component.");
       setTenantContracts([]);
     }
   }, [tenants]);
@@ -29,8 +32,6 @@ function Payments({ tenants = [], selectedExpense }) {
       window.open(url, "_blank"); // Open the PDF in a new tab
     }
   };
-
-  console.log(tenantContracts);
 
   return (
     <Card sx={{ height: "100%" }}>
@@ -67,9 +68,7 @@ function Payments({ tenants = [], selectedExpense }) {
                 onClick={() => openPdf(contract.contractUrl)}
               >
                 <Icon fontSize="small">picture_as_pdf</Icon>
-                <MDTypography variant="button" fontWeight="bold">
-                  &nbsp;View Contract
-                </MDTypography>
+                &nbsp;View Contract
               </MDTypography>
             </MDBox>
           ))
@@ -87,10 +86,10 @@ Payments.propTypes = {
   tenants: PropTypes.arrayOf(
     PropTypes.shape({
       tenant_id: PropTypes.number.isRequired,
-      status: PropTypes.string.isRequired, // Status should be "paid" or "pending"
+      name: PropTypes.string.isRequired,
+      contract: PropTypes.string,
     })
   ).isRequired,
-  selectedExpense: PropTypes.string, // Selected expense ID or identifier
 };
 
 export default Payments;
