@@ -10,29 +10,18 @@ import { useEffect, useState } from "react";
 function Payments({ tenants = [], selectedExpense }) {
   const [tenantContracts, setTenantContracts] = useState([]);
 
-  // Fetch contracts for tenants when the selectedExpense or tenants change
   useEffect(() => {
-    if (selectedExpense && tenants.length > 0) {
-      // Fetch contracts related to the tenants
-      const fetchContracts = async () => {
-        try {
-          const response = await axios.get(
-            `http://localhost:8000/expense/contracts/${selectedExpense}`,
-            { withCredentials: true }
-          );
-          // Assuming the response returns contracts associated with tenants
-          const contracts = response.data.contracts;
-          setTenantContracts(contracts);
-        } catch (error) {
-          console.error("Error fetching contracts:", error);
-        }
-      };
-
-      fetchContracts();
+    if (tenants.length > 0) {
+      // Extract contract information directly from tenants
+      const formattedContracts = tenants.map((tenant) => ({
+        tenantName: tenant.name,
+        contractUrl: tenant.contract, // Assuming `contract` contains the file URL
+      }));
+      setTenantContracts(formattedContracts);
     } else {
       setTenantContracts([]);
     }
-  }, [selectedExpense, tenants]);
+  }, [tenants]);
 
   return (
     <Card sx={{ height: "100%" }}>
@@ -42,40 +31,34 @@ function Payments({ tenants = [], selectedExpense }) {
         </MDTypography>
       </MDBox>
       <MDBox p={2}>
-        {selectedExpense && tenantContracts.length > 0 ? (
-          tenantContracts.map((contract, index) => {
-            // Find the tenant related to this contract
-            const tenant = tenants.find((tenant) => tenant.tenant_id === contract.tenant_id);
-
-            return (
-              <MDBox
-                key={index}
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                p={1}
-                sx={{
-                  border: "1px solid #e0e0e0",
-                  borderRadius: "8px",
-                  mb: 1,
-                  backgroundColor: "#e8f5e9", // Green background for contract data
-                }}
-              >
-                <MDTypography variant="subtitle2" fontWeight="medium">
-                  {tenant ? tenant.name : "Unknown Tenant"}
-                </MDTypography>
-                <MDTypography variant="caption" color="text.secondary" fontWeight="medium">
-                  Contract ID: {contract.id} {/* You can customize this */}
-                </MDTypography>
-                <MDButton variant="outlined" color="primary">
-                  View Contract Details
-                </MDButton>
-              </MDBox>
-            );
-          })
+        {tenantContracts.length > 0 ? (
+          tenantContracts.map((contract, index) => (
+            <MDBox
+              key={index}
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              p={1}
+              sx={{
+                border: "1px solid #e0e0e0",
+                borderRadius: "8px",
+                mb: 1,
+                backgroundColor: "#e8f5e9",
+              }}
+            >
+              <MDTypography variant="subtitle2" fontWeight="medium">
+                {contract.tenantName}
+              </MDTypography>
+              <MDTypography variant="caption" color="text.secondary" fontWeight="medium">
+                <a href={contract.contractUrl} target="_blank" rel="noopener noreferrer">
+                  View Contract
+                </a>
+              </MDTypography>
+            </MDBox>
+          ))
         ) : (
           <MDTypography variant="caption" color="text.secondary" fontWeight="medium">
-            Select an expense to view contract details.
+            No contracts available for the selected tenants.
           </MDTypography>
         )}
       </MDBox>

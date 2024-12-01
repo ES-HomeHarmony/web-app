@@ -16,55 +16,41 @@ function BillingInformation({ tenants, selectedHouse, addInvoice }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedTenant, setSelectedTenant] = useState(""); // State for selected tenant
 
-  const handleSubmit = () => {
-    if (!selectedHouse) {
-      toast.error("Please select a house.");
+  const handleSubmit = async () => {
+    if (!selectedTenant || !selectedHouse || !selectedFile) {
+      toast.error("Please select a house, tenant, and upload a valid contract file.");
       return;
     }
 
-    if (!expenseType || !selectedTenant) {
-      toast.error("Please fill out all fields.");
-      return;
-    }
-
-    if (!selectedFile) {
-      toast.error("Please upload a valid file.");
-      return;
-    }
-
-    // Create FormData to send the file along with other data
     const formData = new FormData();
-    const expenseData = JSON.stringify({
-      house_id: 1, // Use the actual selectedHouse ID if needed
-      amount: price,
-      title: expenseType,
-      deadline_date: deadline,
-    });
-
-    // Append JSON data and file to formData
-    formData.append("expense_data", expenseData);
+    formData.append(
+      "contract_data",
+      JSON.stringify({
+        tenant_id: selectedTenant,
+      })
+    );
     formData.append("file", selectedFile);
 
-    // Make the POST request
-    axios
-      .post("http://localhost:8000/houses/addExpense", formData, {
+    try {
+      const response = await axios.post("http://localhost:8000/uploadContract", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      })
-      .then((response) => {
-        toast.success("Expense added successfully!");
-        addInvoice(expenseType, price, deadline, selectedFile);
-        // Clear the form
-        setExpenseType("");
-        // setPrice("");
-        // setDeadline("");
-        setSelectedFile(null);
-      })
-      .catch((error) => {
-        console.error("Error uploading expense:", error);
-        toast.error("Failed to add expense. Please try again.");
+        withCredentials: true,
       });
+
+      if (response.status === 200 || response.status === 201) {
+        toast.success("Contract uploaded successfully!");
+        // Clear form fields
+        setSelectedTenant("");
+        setSelectedFile(null);
+      } else {
+        toast.error(response.data?.error || "Failed to upload contract. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error uploading contract:", error);
+      toast.error("An error occurred while uploading the contract.");
+    }
   };
 
   const handleFileChange = (event) => {

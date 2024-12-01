@@ -85,27 +85,30 @@ function Billing() {
 
   useEffect(() => {
     const fetchTenants = async () => {
-      if (houseSelected) {
+      if (selectedHouse && selectedHouse.id) {
         try {
           const response = await axios.get(
             `http://localhost:8000/houses/landlord/house/${selectedHouse.id}`,
-            {
-              withCredentials: true,
-            }
+            { withCredentials: true }
           );
-          console.log("Fetched tenants:", response.data.tenents); // Debug line
-          setTenants(response.data.tenents);
+          if (response.data.tenents) {
+            setTenants(response.data.tenents);
+            console.log("Fetched tenants:", response.data.tenents);
+          } else {
+            console.warn("No tenants found in response:", response.data);
+            setTenants([]);
+          }
         } catch (error) {
           console.error("Error fetching tenants:", error);
           toast.error("Failed to fetch tenants. Please try again.");
         }
       } else {
+        console.log("No house selected or house ID is invalid.");
         setTenants([]);
       }
     };
-
     fetchTenants();
-  }, [houseSelected]);
+  }, [selectedHouse]);
 
   const addInvoice = (expenseType, price, deadline, file) => {
     const newInvoice = {
@@ -129,43 +132,6 @@ function Billing() {
       }
     } catch (error) {
       console.error("Error fetching tenant payment status:", error);
-    }
-  };
-
-  const handleAddTenants = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleTenantChange = (e) => {
-    const { name, value } = e.target;
-    setTenantData({ ...tenantData, [name]: value });
-  };
-
-  const handleTenantSubmit = async () => {
-    const new_tenant = {
-      house_id: selectedHouse.id,
-      rent: parseInt(tenantData.rent, 10), // Ensure rent is an integer
-      name: tenantData.name,
-      email: tenantData.email,
-    };
-
-    console.log(new_tenant);
-
-    try {
-      const response = await axios.post("http://localhost:8000/houses/tenents", new_tenant, {
-        withCredentials: true,
-      });
-      console.log("Tenant created response:", response);
-      toast.success("Tenant added successfully!");
-      setTenantData({ name: "", email: "", rent: "" }); // Reset form
-      setIsModalOpen(false); // Close modal
-    } catch (error) {
-      console.error("Failed to add tenant:", error.response?.data || error.message);
-      toast.error("Failed to create tenant. Please try again.");
     }
   };
 
