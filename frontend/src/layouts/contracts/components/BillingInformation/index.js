@@ -8,13 +8,27 @@ import Icon from "@mui/material/Icon";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+import { CircularProgress } from "@mui/material"; // Import for loading spinner
+import { useEffect } from "react";
 
-function BillingInformation({ tenants, selectedHouse, addInvoice }) {
-  const [expenseType, setExpenseType] = useState("");
-  // const [price, setPrice] = useState("");
-  // const [deadline, setDeadline] = useState("");
+function BillingInformation({ tenants, selectedHouse }) {
+  console.log(tenants);
+
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedTenant, setSelectedTenant] = useState(""); // State for selected tenant
+  const [loading, setLoading] = useState(false); // State for loading
+
+  // Simulate fetching tenants when the selectedHouse changes
+  useEffect(() => {
+    if (selectedHouse) {
+      setLoading(true);
+
+      // Simulate an API call
+      setTimeout(() => {
+        setLoading(false);
+      }, 1500); // Simulated delay (1.5 seconds)
+    }
+  }, [selectedHouse]);
 
   const handleSubmit = async () => {
     if (!selectedTenant || !selectedHouse || !selectedFile) {
@@ -32,7 +46,7 @@ function BillingInformation({ tenants, selectedHouse, addInvoice }) {
     formData.append("file", selectedFile);
 
     try {
-      const response = await axios.post("http://localhost:8000/uploadContract", formData, {
+      const response = await axios.post("http://localhost:8000/houses/uploadContract", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -73,6 +87,8 @@ function BillingInformation({ tenants, selectedHouse, addInvoice }) {
     setSelectedFile(file); // Set the file if valid
   };
 
+  console.log(selectedTenant);
+
   return (
     <Card id="delete-account">
       <MDBox pt={3} px={2}>
@@ -92,53 +108,34 @@ function BillingInformation({ tenants, selectedHouse, addInvoice }) {
         >
           <FormControl fullWidth margin="normal">
             <InputLabel id="tenant-select-label">Select Tenant</InputLabel>
-            <Select
-              labelId="tenant-select-label"
-              id="tenant-select"
-              value={selectedTenant}
-              onChange={(e) => setSelectedTenant(e.target.value)}
-              label="Select Tenant"
-            >
-              {tenants && tenants.length > 0 ? (
-                tenants.map((tenant) => (
-                  <MenuItem key={tenant.id} value={tenant.id}>
-                    {tenant.name}
+            {loading ? (
+              <CircularProgress size={24} sx={{ margin: "16px auto" }} /> // Loading spinner
+            ) : (
+              <Select
+                labelId="tenant-select-label"
+                id="tenant-select"
+                value={selectedTenant || ""} // Bind value to state
+                onChange={(e) => {
+                  console.log("Selected Tenant ID:", e.target.value); // Debug selected value
+                  setSelectedTenant(e.target.value); // Update state
+                }}
+                label="Select Tenant"
+              >
+                {tenants && tenants.length > 0 ? (
+                  tenants.map((tenant) => (
+                    <MenuItem key={tenant.tenant_id} value={tenant.tenant_id}>
+                      {tenant.name}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem value="" disabled>
+                    No tenants available
                   </MenuItem>
-                ))
-              ) : (
-                <MenuItem value="">No tenants available</MenuItem> // Fallback if no tenants
-              )}
-            </Select>
+                )}
+              </Select>
+            )}
           </FormControl>
 
-          {/* <TextField
-            id="type"
-            fullWidth
-            label="Expense Type"
-            value={expenseType}
-            onChange={(e) => setExpenseType(e.target.value)}
-            margin="normal"
-          /> */}
-          {/* <TextField
-            id="price"
-            fullWidth
-            label="Price"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            margin="normal"
-          />
-          <TextField
-            id="deadline"
-            fullWidth
-            label="Deadline"
-            type="date" // Change type to "date" for date picker
-            value={deadline}
-            onChange={(e) => setDeadline(e.target.value)}
-            margin="normal"
-            InputLabelProps={{
-              shrink: true, // Ensure the label stays above the date picker
-            }}
-          /> */}
           <input
             type="file"
             accept=".pdf,.jpeg,.png"
@@ -170,7 +167,6 @@ function BillingInformation({ tenants, selectedHouse, addInvoice }) {
             Save Changes
           </Button>
           <div>
-            {/* Your existing code */}
             <ToastContainer />
           </div>
         </MDBox>

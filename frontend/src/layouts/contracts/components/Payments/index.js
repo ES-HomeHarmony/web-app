@@ -13,15 +13,24 @@ function Payments({ tenants = [], selectedExpense }) {
   useEffect(() => {
     if (tenants.length > 0) {
       // Extract contract information directly from tenants
+      console.log("Tenants:", tenants); // Debug line
       const formattedContracts = tenants.map((tenant) => ({
         tenantName: tenant.name,
-        contractUrl: tenant.contract, // Assuming `contract` contains the file URL
+        contractUrl: tenant.contarct, // Assuming `contract` contains the file URL
       }));
       setTenantContracts(formattedContracts);
     } else {
       setTenantContracts([]);
     }
   }, [tenants]);
+
+  const openPdf = (url) => {
+    if (url) {
+      window.open(url, "_blank"); // Open the PDF in a new tab
+    }
+  };
+
+  console.log(tenantContracts);
 
   return (
     <Card sx={{ height: "100%" }}>
@@ -49,10 +58,18 @@ function Payments({ tenants = [], selectedExpense }) {
               <MDTypography variant="subtitle2" fontWeight="medium">
                 {contract.tenantName}
               </MDTypography>
-              <MDTypography variant="caption" color="text.secondary" fontWeight="medium">
-                <a href={contract.contractUrl} target="_blank" rel="noopener noreferrer">
-                  View Contract
-                </a>
+              <MDTypography
+                variant="button"
+                display="flex"
+                fontWeight="bold"
+                alignItems="center"
+                sx={{ cursor: "pointer" }}
+                onClick={() => openPdf(contract.contractUrl)}
+              >
+                <Icon fontSize="small">picture_as_pdf</Icon>
+                <MDTypography variant="button" fontWeight="bold">
+                  &nbsp;View Contract
+                </MDTypography>
               </MDTypography>
             </MDBox>
           ))

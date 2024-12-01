@@ -6,23 +6,16 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import Button from "@mui/material/Button";
-import Modal from "@mui/material/Modal";
-import Box from "@mui/material/Box";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-import MDInput from "components/MDInput";
-import MDButton from "components/MDButton";
 import MDTypography from "components/MDTypography";
 
 // Material Dashboard 2 React examples
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import Invoices from "layouts/contracts/components/Invoices";
 import BillingInformation from "layouts/contracts/components/BillingInformation";
-import Transactions from "layouts/contracts/components/Transactions";
 import Payments from "layouts/contracts/components/Payments";
 import { toast } from "react-toastify";
 
@@ -34,32 +27,7 @@ function Billing() {
   const [invoices, setInvoices] = useState([]);
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [tenants, setTenants] = useState([]); // New state for tenants
-  const [houseSelected, setHouseSelected] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [tenantData, setTenantData] = useState({ name: "", email: "", rent: "" });
 
-  // Modal styles
-  const modalStyle = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 400,
-    bgcolor: "background.paper",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: "10px",
-    boxShadow: 24,
-    p: 4,
-  };
-
-  const modalStyle2 = {
-    display: "flex",
-    flexDirection: "column",
-    gap: "10px",
-    width: "100%",
-  };
   // Fetch the list of houses when the component mounts
   useEffect(() => {
     const fetchHouses = async () => {
@@ -119,20 +87,6 @@ function Billing() {
       house: selectedHouse,
     };
     setInvoices([...invoices, newInvoice]);
-  };
-
-  const handleSelectExpense = async (expenseId) => {
-    setSelectedExpense(expenseId);
-    try {
-      const response = await axios.get(`http://localhost:8000/houses/expense/${expenseId}`);
-      if (response.data && response.data.tenants) {
-        setTenants(response.data.tenants); // Set tenants for the selected expense
-      } else {
-        console.warn("No tenant data received for the selected expense");
-      }
-    } catch (error) {
-      console.error("Error fetching tenant payment status:", error);
-    }
   };
 
   return (
