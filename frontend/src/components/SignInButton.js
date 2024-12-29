@@ -5,7 +5,7 @@ import Button from "@mui/material/Button"; // Or use any other button component 
 
 function SignInButton({ onClick }) {
   return (
-    <Button variant="contained" color="primary" onClick={onClick}>
+    <Button variant="outlined" color="primary" sx={{ backgroundColor: "blue" }} onClick={onClick}>
       Sign In
     </Button>
   );

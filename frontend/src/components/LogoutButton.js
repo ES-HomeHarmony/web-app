@@ -4,7 +4,7 @@ import Button from "@mui/material/Button"; // Or use any other button component 
 
 function LogoutButton({ onClick }) {
   return (
-    <Button variant="contained" color="primary" onClick={onClick}>
+    <Button variant="contained" color="error" onClick={onClick}>
       Logout
     </Button>
   );

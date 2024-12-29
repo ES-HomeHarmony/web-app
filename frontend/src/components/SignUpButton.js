@@ -5,7 +5,7 @@ import Button from "@mui/material/Button";
 
 function SignUpButton({ onClick }) {
   return (
-    <Button variant="contained" color="secondary" onClick={onClick}>
+    <Button variant="outlined" color="secondary" sx={{ color: "grey" }} onClick={onClick}>
       Sign Up
     </Button>
   );

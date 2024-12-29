@@ -42,6 +42,7 @@ import Billing from "layouts/billing";
 import Contracts from "layouts/contracts";
 import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
+import TenantDashboard from "layouts/tenant_dashboard";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -54,6 +55,14 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
+  },
+  {
+    type: "collapse",
+    name: "Tenant Dashboard",
+    key: "tenant_dashboard",
+    icon: <Icon fontSize="small">dashboard</Icon>,
+    route: "/tenant_dashboard",
+    component: <TenantDashboard />,
   },
   {
     type: "collapse",
