@@ -29,7 +29,7 @@ function OrdersOverview() {
     <Card sx={{ height: "100%" }}>
       <MDBox pt={3} px={3}>
         <MDTypography variant="h6" fontWeight="medium">
-          Issues
+          Alerts
         </MDTypography>
       </MDBox>
       <MDBox p={2}>
