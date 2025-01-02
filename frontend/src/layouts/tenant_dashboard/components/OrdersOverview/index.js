@@ -30,15 +30,23 @@ import AddIssueModal from "layouts/tenant_dashboard/components/AddIssueModal";
 
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function OrdersOverview() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [issueData, setIssueData] = useState({ description: "", urgency: "" });
+  const [issueData, setIssueData] = useState({
+    title: null,
+    description: null,
+    priority: "",
+    status: "to-do",
+    house_id: 1,
+  });
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setIssueData({ description: "", urgency: "" }); // Reset the issue data when closing the modal
+    setIssueData({ title: null, description: null, priority: "", status: "to-do", house_id: 1 }); // Reset the issue data when closing the modal
   };
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,18 +55,28 @@ function OrdersOverview() {
 
   const handleSubmit = () => {
     console.log("New Issue Data:", issueData);
-    // Add logic to send the issue to the backend using axios
-    // Example:
-    // axios.post("http://localhost:8000/issues", issueData)
-    //   .then(() => {
-    //     console.log("Issue added successfully");
-    //     toast.success("Issue added successfully");
-    //     handleCloseModal();
-    //   })
-    //   .catch((error) => {
-    //     console.error("Error adding issue:", error);
-    //     toast.error("Error adding issue");
-    //   });
+
+    if (issueData.title === null) {
+      toast.error("Title is required");
+      return;
+    }
+
+    if (issueData.description === null) {
+      toast.error("Description is required");
+      return;
+    }
+
+    axios
+      .post("http://localhost:8000/tenants/createIssue", issueData, { withCredentials: true })
+      .then(() => {
+        console.log("Issue added successfully");
+        toast.success("Issue added successfully");
+        handleCloseModal();
+      })
+      .catch((error) => {
+        console.error("Error adding issue:", error);
+        toast.error("Error adding issue");
+      });
     handleCloseModal(); // Close modal after submission
   };
   return (
@@ -156,6 +174,10 @@ function OrdersOverview() {
         handleChange={handleChange}
         handleSubmit={handleSubmit}
       />
+      <div>
+        {/* Your existing code */}
+        <ToastContainer />
+      </div>
     </Card>
   );
 }

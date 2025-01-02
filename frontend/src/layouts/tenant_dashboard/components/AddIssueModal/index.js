@@ -10,6 +10,7 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import { Icon } from "@mui/material";
 
 const AddIssueModal = ({ open, onClose, issueData, handleChange, handleSubmit }) => {
   const modalStyle = {
@@ -33,8 +34,26 @@ const AddIssueModal = ({ open, onClose, issueData, handleChange, handleSubmit })
       <Box sx={modalStyle}>
         <MDTypography variant="h5" fontWeight="bold" mb={1}>
           Add Issue
+          <MDBox
+            variant="button"
+            color="secondary"
+            onClick={onClose}
+            sx={{ display: "flex", fontWeight: "bold", float: "right" }}
+            style={{ cursor: "pointer" }}
+          >
+            <Icon fontSize="small">close</Icon>
+          </MDBox>
         </MDTypography>
         <MDBox component="form" style={{ width: "100%" }}>
+          <MDInput
+            type="text"
+            label="Title"
+            name="title"
+            value={issueData.title}
+            onChange={handleChange}
+            fullWidth
+            style={{ marginBottom: "20px" }}
+          />
           <MDInput
             type="text"
             label="Description"
@@ -45,16 +64,24 @@ const AddIssueModal = ({ open, onClose, issueData, handleChange, handleSubmit })
             style={{ marginBottom: "20px" }}
           />
           <FormControl fullWidth style={{ marginBottom: "20px" }}>
-            <InputLabel>Urgency</InputLabel>
+            <InputLabel>Priority</InputLabel>
             <Select
-              name="urgency"
-              value={issueData.urgency}
+              name="priority"
+              value={issueData.priority}
               onChange={handleChange}
-              label="Urgency"
+              label="priority"
             >
               <MenuItem value="low">Low</MenuItem>
               <MenuItem value="medium">Medium</MenuItem>
               <MenuItem value="high">High</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth style={{ marginBottom: "20px" }}>
+            <InputLabel>Status</InputLabel>
+            <Select name="status" value={issueData.status} onChange={handleChange} label="status">
+              <MenuItem value="to-do">To Be Fixed</MenuItem>
+              <MenuItem value="in_progress">Being Fixed</MenuItem>
+              <MenuItem value="done">Fixed</MenuItem>
             </Select>
           </FormControl>
           <MDButton
@@ -76,8 +103,10 @@ AddIssueModal.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   issueData: PropTypes.shape({
+    title: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
-    urgency: PropTypes.string.isRequired,
+    priority: PropTypes.string.isRequired,
+    status: PropTypes.string.isRequired,
   }).isRequired,
   handleChange: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
