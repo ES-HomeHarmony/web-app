@@ -37,6 +37,7 @@ Coded by www.creative-tim.com
 
 // Material Dashboard 2 React layouts
 import Dashboard from "layouts/dashboard";
+import TenantDashboard from "layouts/tenant_dashboard";
 import Tables from "layouts/tables";
 import Billing from "layouts/billing";
 import Contracts from "layouts/contracts";
@@ -54,6 +55,14 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
+  },
+  {
+    type: "collapse",
+    name: "Tenant Dashboard",
+    key: "tenant_dashboard",
+    icon: <Icon fontSize="small">dashboard</Icon>,
+    route: "/tenant_dashboard",
+    component: <TenantDashboard />,
   },
   {
     type: "collapse",
