@@ -27,6 +27,7 @@ function TenantDashboard() {
   const [logged, setLogged] = useState(false);
   const [userName, setUserName] = useState("");
 
+  const colors = ["primary", "info", "success", "warning", "error"]; // Array de cores alternadas
 
   function redirectToSignIn() {
     window.location.href = "http://localhost:8001/auth/login";
