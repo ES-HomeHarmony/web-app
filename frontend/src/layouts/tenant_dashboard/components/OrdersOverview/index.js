@@ -17,6 +17,7 @@ Coded by www.creative-tim.com
 import { Button } from "@mui/material";
 import Card from "@mui/material/Card";
 import Icon from "@mui/material/Icon";
+import PropTypes from "prop-types";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -33,146 +34,143 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-function OrdersOverview() {
+function OrdersOverview({
+  selectedHouse,
+  isTenant,
+  issues,
+  fetchIssues,
+  handleSubmit,
+  handleDelete,
+}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [issueData, setIssueData] = useState({
-    title: null,
-    description: null,
-    priority: "",
-    status: "to-do",
-    house_id: 1,
-  });
+  const [issueData, setIssueData] = useState({});
 
-  const handleOpenModal = () => setIsModalOpen(true);
+  const handleOpenModal = (issue = {}) => {
+    setIssueData(issue);
+    setIsModalOpen(true);
+  };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setIssueData({ title: null, description: null, priority: "", status: "to-do", house_id: 1 }); // Reset the issue data when closing the modal
+    setIssueData({});
   };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setIssueData({ ...issueData, [name]: value });
   };
 
-  const handleSubmit = () => {
-    console.log("New Issue Data:", issueData);
-
-    if (issueData.title === null) {
-      toast.error("Title is required");
-      return;
+  const submitIssue = async () => {
+    try {
+      await handleSubmit(issueData);
+      handleCloseModal();
+    } catch (error) {
+      toast.error("Error saving issue.");
     }
-
-    if (issueData.description === null) {
-      toast.error("Description is required");
-      return;
-    }
-
-    axios
-      .post("http://localhost:8000/tenants/createIssue", issueData, { withCredentials: true })
-      .then(() => {
-        console.log("Issue added successfully");
-        toast.success("Issue added successfully");
-        handleCloseModal();
-      })
-      .catch((error) => {
-        console.error("Error adding issue:", error);
-        toast.error("Error adding issue");
-      });
-    handleCloseModal(); // Close modal after submission
   };
+
   return (
     <Card sx={{ height: "100%" }}>
       <MDBox pt={3} px={3}>
         <MDTypography variant="h6" fontWeight="medium">
           Issues
-          <MDBox
-            variant="gradient"
-            bgColor="warning"
-            sx={{
-              float: "right",
-              width: "2rem",
-              height: "2rem",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: "50%", // Optional for a circular button
-            }}
-            style={{ cursor: "pointer" }}
-            onClick={handleOpenModal}
-          >
-            <Icon fontSize="medium" color="dark">
-              add
-            </Icon>
-          </MDBox>
-          {/* <MDBox
-            variant="gradient"
-            bgColor="error"
-            color="light"
-            borderRadius="xl"
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            width="4rem"s
-            height="4rem"
-            mt={-3}
-            style={{ float: "right" }}
-          >
-            <Icon fontSize="medium" color="inherit">
-              add
-            </Icon>
-          </MDBox> */}
+          {isTenant && (
+            <MDBox
+              variant="gradient"
+              bgColor="warning"
+              sx={{
+                float: "right",
+                width: "2rem",
+                height: "2rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: "50%",
+              }}
+              style={{ cursor: "pointer" }}
+              onClick={() => handleOpenModal()}
+            >
+              <Icon fontSize="medium" color="dark">
+                add
+              </Icon>
+            </MDBox>
+          )}
         </MDTypography>
       </MDBox>
       <MDBox p={2}>
-        <TimelineItem
-          color="success"
-          icon="notifications"
-          title="$2400, Design changes"
-          dateTime="22 DEC 7:20 PM"
-        />
-        <TimelineItem
-          color="success"
-          icon="notifications"
-          title="$2400, Design changes"
-          dateTime="22 DEC 7:20 PM"
-        />
-        <TimelineItem
-          color="error"
-          icon="inventory_2"
-          title="New order #1832412"
-          dateTime="21 DEC 11 PM"
-        />
-        <TimelineItem
-          color="info"
-          icon="shopping_cart"
-          title="Server payments for April"
-          dateTime="21 DEC 9:34 PM"
-        />
-        <TimelineItem
-          color="warning"
-          icon="payment"
-          title="New card added for order #4395133"
-          dateTime="20 DEC 2:20 AM"
-        />
-        <TimelineItem
-          color="warning"
-          icon="payment"
-          title="New card added for order #4395133"
-          dateTime="20 DEC 2:20 AM"
-        />
-        <TimelineItem
-          color="primary"
-          icon="vpn_key"
-          title="I need the key to the house"
-          dateTime="18 DEC 4:54 AM"
-          lastItem
-        />
+        {issues.length > 0 ? (
+          issues.map((issue, index) => (
+            <TimelineItem
+              key={index}
+              color={
+                issue.priority === "high"
+                  ? "error"
+                  : issue.priority === "medium"
+                  ? "warning"
+                  : "success"
+              }
+              icon={
+                issue.status === "to-do"
+                  ? "pending"
+                  : issue.status === "in_progress"
+                  ? "build"
+                  : "check_circle"
+              }
+              title={issue.title}
+              dateTime={new Date(issue.created_at).toLocaleString()}
+              description={
+                <MDBox display="flex" justifyContent="space-between" alignItems="center">
+                  <span>{issue.description}</span>
+                  <MDBox display="flex" gap={1}>
+                    {isTenant && (
+                      <>
+                        <Icon
+                          style={{ cursor: "pointer", color: "blue" }}
+                          onClick={() => handleOpenModal(issue)}
+                        >
+                          edit
+                        </Icon>
+                        <Icon
+                          style={{ cursor: "pointer", color: "red" }}
+                          onClick={() => handleDelete(issue.id)}
+                        >
+                          delete
+                        </Icon>
+                      </>
+                    )}
+                    {!isTenant && (
+                      <>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => handleEditIssueStatus(issue.id, "being_fixed")}
+                        >
+                          Mark Being Fixed
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => handleEditIssueStatus(issue.id, "fixed")}
+                        >
+                          Mark Fixed
+                        </Button>
+                      </>
+                    )}
+                  </MDBox>
+                </MDBox>
+              }
+            />
+          ))
+        ) : (
+          <MDTypography>No issues found for this house.</MDTypography>
+        )}
       </MDBox>
       <AddIssueModal
         open={isModalOpen}
         onClose={handleCloseModal}
         issueData={issueData}
         handleChange={handleChange}
-        handleSubmit={handleSubmit}
+        handleSubmit={submitIssue}
       />
       <div>
         {/* Your existing code */}
@@ -181,5 +179,15 @@ function OrdersOverview() {
     </Card>
   );
 }
+
+OrdersOverview.propTypes = {
+  selectedHouse: PropTypes.object,
+  isTenant: PropTypes.bool.isRequired,
+  issues: PropTypes.array,
+  fetchIssues: PropTypes.func,
+  handleSubmit: PropTypes.func,
+  handleEditIssueStatus: PropTypes.func,
+  handleDelete: PropTypes.func,
+};
 
 export default OrdersOverview;

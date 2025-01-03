@@ -5,54 +5,28 @@ import Grid from "@mui/material/Grid";
 
 import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
 import Invoices from "layouts/billing/components/Invoices";
 import OrdersOverview from "layouts/tenant_dashboard/components/OrdersOverview";
 import TenantDashboardNavbar from "examples/Navbars/TenantDashboardNavbar";
 
-import SignInButton from "../../components/SignInButton";
-import SignUpButton from "../../components/SignUpButton";
-import LogoutButton from "../../components/LogoutButton";
-import landlordService from "../../services/landlordService";
+import tenantService from "services/tenantService";
 import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
+import { toast } from "react-toastify";
 
 function TenantDashboard() {
-  const { sales, tasks } = reportsLineChartData;
-  const navigate = useNavigate(); // Hook to navigate programmatically
   const [houses, setHouses] = useState([]);
-  const [invoices, setInvoices] = useState([]);
   const [selectedHouse, setSelectedHouse] = useState(null);
   const [logged, setLogged] = useState(false);
   const [userName, setUserName] = useState("");
+  const [issues, setIssues] = useState([]);
 
   const colors = ["primary", "info", "success", "warning", "error"]; // Array de cores alternadas
 
-  function redirectToSignIn() {
-    window.location.href = "http://localhost:8001/auth/login";
-  }
-
-  async function redirectToLogout() {
-    window.location.href = "http://localhost:8001/auth/logout";
-  }
-
-  const handleSelectExpense = async (expenseId) => {
-    setSelectedExpense(expenseId);
-    try {
-      const response = await axios.get(`http://localhost:8000/houses/expense/${expenseId}`);
-      if (response.data && response.data.tenants) {
-        setTenants(response.data.tenants); // Set tenants for the selected expense
-      } else {
-        console.warn("No tenant data received for the selected expense");
-      }
-    } catch (error) {
-      console.error("Error fetching tenant payment status:", error);
-    }
-  };
-
   const handleHouseClick = (house) => {
     setSelectedHouse(house); // Set the selected house
+    console.log("Selected house:", house.id); // Debug line
   };
 
   useEffect(() => {
@@ -87,16 +61,95 @@ function TenantDashboard() {
 
     const fetchHouses = async () => {
       try {
-        const response = await landlordService.fetchHousesByTenant();
+        const response = await tenantService.fetchHousesByTenant();
         setHouses(response);
       } catch (error) {
-        console.error("Erro ao buscar casas:", error);
+        console.error("Error fetching houses:", error);
       }
     };
 
+    if (selectedHouse && selectedHouse.id) {
+      const fetchExpenses = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8000/houses/expenses/${selectedHouse.id}`
+          );
+          const pendingExpenses = response.data.filter((expense) => expense.status !== "paid");
+          setExpenses(pendingExpenses);
+        } catch (error) {
+          console.error("Error fetching expenses:", error);
+        }
+      };
+      fetchExpenses();
+      fetchIssues();
+    }
+
     fetchUserProfile();
     fetchHouses();
-  }, []);
+  }, [selectedHouse]);
+
+  const fetchIssues = async () => {
+    try {
+      const response = await tenantService.fetchIssuesbyHouse(selectedHouse.id);
+      setIssues(response);
+    } catch (error) {
+      toast.error("Error fetching issues.");
+    }
+  };
+
+  const handleSubmit = async (issueData) => {
+    if (!selectedHouse || !selectedHouse.id) {
+      toast.error("Please select a house before creating an issue.");
+      return;
+    }
+
+    console.log("New Issue Data before submission:", issueData);
+
+    // Add the selected house ID to the issue data
+    const dataToSubmit = { ...issueData, house_id: selectedHouse.id };
+
+    if (!dataToSubmit.title) {
+      toast.error("Title is required.");
+      return;
+    }
+
+    if (!dataToSubmit.description) {
+      toast.error("Description is required.");
+      return;
+    }
+
+    try {
+      if (dataToSubmit.id) {
+        await tenantService.updateIssue(dataToSubmit);
+        toast.success("Issue updated successfully.");
+      } else {
+        await tenantService.createIssue(dataToSubmit);
+        toast.success("Issue created successfully.");
+      }
+      await fetchIssues();
+    } catch (error) {
+      console.error("Error saving issue:", error);
+      toast.error("Error saving issue.");
+    }
+  };
+
+  const handleDelete = async (issueId) => {
+    // Display a confirmation alert
+    if (
+      !window.confirm("Are you sure you want to delete this issue? This action cannot be undone.")
+    ) {
+      return; // Exit if the user cancels
+    }
+
+    try {
+      // Proceed with deletion if confirmed
+      await tenantService.deleteIssue(issueId);
+      toast.success("Issue deleted successfully.");
+      await fetchIssues(); // Refresh the issue list
+    } catch (error) {
+      toast.error("Error deleting issue.");
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -125,7 +178,7 @@ function TenantDashboard() {
           <p>No houses found.</p>
         )}
         {/* Mensagem de boas-vindas e controle de login/logout */}
-        <Grid item xs={12}>
+        {/* <Grid item xs={12}>
           <MDBox textAlign="center" mt={3}>
             {logged ? (
               <>
@@ -140,18 +193,24 @@ function TenantDashboard() {
               </div>
             )}
           </MDBox>
-        </Grid>
+        </Grid> */}
         <MDBox mt={4.5}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={8}>
               <Invoices
-                invoices={invoices}
                 selectedHouse={selectedHouse}
-                onDetailsClick={handleSelectExpense}
+                onDetailsClick={(expenseId) => console.log(expenseId)}
               />
             </Grid>
             <Grid item xs={12} md={6} lg={4}>
-              <OrdersOverview />
+              <OrdersOverview
+                selectedHouse={selectedHouse}
+                isTenant={true}
+                issues={issues}
+                fetchIssues={fetchIssues}
+                handleSubmit={handleSubmit}
+                handleDelete={handleDelete}
+              />
             </Grid>
           </Grid>
         </MDBox>
