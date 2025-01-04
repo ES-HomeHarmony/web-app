@@ -31,7 +31,21 @@ export async function fetchHousesByLandlord() {
   }
 }
 
+// Função para buscar a casa associada a um tenant específico
+// export async function fetchHousesByTenant() {
+//   try {
+//     const response = await axios.get(`${API_URL}/houses/tenant`, {
+//       withCredentials: true, // Inclui cookies de autenticação
+//     });
+//     return response.data; // Retorna os dados em JSON
+//   } catch (error) {
+//     console.error("Erro ao buscar casa(s):", error);
+//     throw error;
+//   }
+// }
+
 export default {
   createHouse,
   fetchHousesByLandlord,
+  // fetchHousesByTenant,
 };

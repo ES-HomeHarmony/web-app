@@ -130,7 +130,7 @@ function Dashboard() {
           </Grid>
 
           {/* Mensagem de boas-vindas e controle de login/logout */}
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <MDBox textAlign="center" mt={3}>
               {logged ? (
                 <>
@@ -145,7 +145,7 @@ function Dashboard() {
                 </div>
               )}
             </MDBox>
-          </Grid>
+          </Grid> */}
         </Grid>
 
         {/* Seções adicionais da dashboard */}
