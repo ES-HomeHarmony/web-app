@@ -91,6 +91,12 @@ function TenantDashboard() {
   const fetchIssues = async () => {
     try {
       const response = await tenantService.fetchIssuesbyHouse(selectedHouse.id);
+
+      console.log("Issues:", response);
+
+      if (!response) {
+        toast.warning("No issues found for this house.");
+      }
       setIssues(response);
     } catch (error) {
       toast.error("Error fetching issues.");
@@ -155,28 +161,32 @@ function TenantDashboard() {
     <DashboardLayout>
       <TenantDashboardNavbar />
       <MDBox py={3}>
-        {/* Seções adicionais da dashboard */}
-        {houses.length > 0 ? (
-          houses.map((house, index) => (
-            <div
-              key={house.id} // Ensure unique key for each card
-              onClick={() => handleHouseClick(house)} // Handle click event
-              style={{ cursor: "pointer" }} // Add pointer cursor for better UX
-            >
-              <ComplexStatisticsCard
-                key={house.id} // Ensure each card has a unique key
-                color={colors[index % colors.length]} // Alternate colors
-                icon="house"
-                title={house.name} // House name
-                percentage={{
-                  amount: `${house.address}, ${house.city}, ${house.state}, ${house.zipcode}`,
-                }}
-              />
-            </div>
-          ))
-        ) : (
-          <p>No houses found.</p>
-        )}
+        <Grid container spacing={3}>
+          {/* Seções adicionais da dashboard */}
+          {houses.length > 0 ? (
+            houses.map((house, index) => (
+              <Grid item xs={12} md={6} lg={3} key={index}>
+                <MDBox
+                  mb={1.5}
+                  onClick={() => handleHouseClick(house)} // Pass the actual name of the house
+                  style={{ cursor: "pointer" }}
+                >
+                  <ComplexStatisticsCard
+                    key={house.id}
+                    color={colors[index % colors.length]} // Alterna entre as cores
+                    icon="house"
+                    title={house.name} // Nome da casa
+                    percentage={{
+                      amount: `${house.address},${house.city}, ${house.state}, ${house.zipcode}`,
+                    }}
+                  />
+                </MDBox>
+              </Grid>
+            ))
+          ) : (
+            <p>No houses found.</p>
+          )}
+        </Grid>
         {/* Mensagem de boas-vindas e controle de login/logout */}
         {/* <Grid item xs={12}>
           <MDBox textAlign="center" mt={3}>
