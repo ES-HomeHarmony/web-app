@@ -55,8 +55,14 @@ import brandDark from "assets/images/HomeHarmonyLogo.png";
 
 import Callback from "./Callback"; // Adjust path if necessary
 
+import { fetchUserRole } from "./services/tenantService"; // Import the fetchUserRole function
+import TenantDashboard from "./layouts/tenant_dashboard"; // Import the TenantDashboard component
+import ProtectedRoute from "./components/ProtectedRoute"; // Import the ProtectedRoute component
+
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
+  const [role, setRole] = useState(null);
+  const [loading, setLoading] = useState(true);
   const {
     miniSidenav,
     direction,
@@ -111,6 +117,33 @@ export default function App() {
     document.scrollingElement.scrollTop = 0;
   }, [pathname]);
 
+  useEffect(() => {
+    const getRole = async () => {
+      try {
+        const userRole = await fetchUserRole();
+        setRole(userRole); // Set the fetched role
+      } catch (error) {
+        setRole(null); // Handle errors gracefully
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getRole();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // Show a loader while fetching the role
+  }
+
+  // Filter routes based on the user role
+  const filteredRoutes = routes.filter((route) => {
+    if (role === "tenant") {
+      return route.key === "tenant_dashboard"; // Only Tenant Dashboard for tenants
+    }
+    return route.key !== "tenant_dashboard"; // Hide Tenant Dashboard for non-tenants
+  });
+
   const getRoutes = (allRoutes) =>
     allRoutes.map((route) => {
       if (route.collapse) {
@@ -158,7 +191,7 @@ export default function App() {
               color={sidenavColor}
               brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
               brandName="House Harmony"
-              routes={routes}
+              routes={filteredRoutes}
               onMouseEnter={handleOnMouseEnter}
               onMouseLeave={handleOnMouseLeave}
             />
@@ -168,9 +201,21 @@ export default function App() {
         )}
         {layout === "vr" && <Configurator />}
         <Routes>
-          {getRoutes(routes)}
-          <Route exact path="/dashboard" element={<Callback />} />
-          <Route path="*" element={<Navigate to="/dashboard" />} />
+          {getRoutes(filteredRoutes)}
+          <Route
+            path="/tenant_dashboard"
+            element={
+              <ProtectedRoute>
+                <TenantDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="*"
+            element={
+              role === "tenant" ? <Navigate to="/tenant_dashboard" /> : <Navigate to="/dashboard" />
+            }
+          />{" "}
         </Routes>
       </ThemeProvider>
     </CacheProvider>
@@ -183,7 +228,7 @@ export default function App() {
             color={sidenavColor}
             brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
             brandName="House Harmony"
-            routes={routes}
+            routes={filteredRoutes}
             onMouseEnter={handleOnMouseEnter}
             onMouseLeave={handleOnMouseLeave}
           />
@@ -193,8 +238,21 @@ export default function App() {
       )}
       {layout === "vr" && <Configurator />}
       <Routes>
-        {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
+        {getRoutes(filteredRoutes)}
+        <Route
+          path="/tenant_dashboard"
+          element={
+            <ProtectedRoute>
+              <TenantDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            role === "tenant" ? <Navigate to="/tenant_dashboard" /> : <Navigate to="/dashboard" />
+          }
+        />
       </Routes>
     </ThemeProvider>
   );

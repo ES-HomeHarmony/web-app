@@ -5,31 +5,29 @@ import Grid from "@mui/material/Grid";
 
 import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
 import Invoices from "layouts/billing/components/Invoices";
-import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
+import OrdersOverview from "layouts/tenant_dashboard/components/OrdersOverview";
+import TenantDashboardNavbar from "examples/Navbars/TenantDashboardNavbar";
 
-import landlordService from "../../services/landlordService";
+import tenantService from "services/tenantService";
+import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
+import { toast } from "react-toastify";
 
-function Dashboard() {
-  const navigate = useNavigate(); // Hook to navigate programmatically
+function TenantDashboard() {
+  const [houses, setHouses] = useState([]);
+  const [selectedHouse, setSelectedHouse] = useState(null);
   const [logged, setLogged] = useState(false);
   const [userName, setUserName] = useState("");
-  const [houses, setHouses] = useState([]);
-  const [landlordId, setLandlordId] = useState("");
   const [issues, setIssues] = useState([]);
 
   const colors = ["primary", "info", "success", "warning", "error"]; // Array de cores alternadas
 
-  function redirectToSignIn() {
-    window.location.href = "http://localhost:8001/auth/login";
-  }
-
-  async function redirectToLogout() {
-    window.location.href = "http://localhost:8001/auth/logout";
-  }
+  const handleHouseClick = (house) => {
+    setSelectedHouse(house); // Set the selected house
+    console.log("Selected house:", house.id); // Debug line
+  };
 
   useEffect(() => {
     const getAccessTokenFromCookies = () => {
@@ -48,9 +46,8 @@ function Dashboard() {
             withCredentials: true,
           });
 
-          if (response.data) {
+          if (response.data?.name) {
             setUserName(response.data.name);
-            setLandlordId(response.data.cognito_id);
             setLogged(true);
           }
         } catch (error) {
@@ -64,43 +61,46 @@ function Dashboard() {
 
     const fetchHouses = async () => {
       try {
-        const response = await landlordService.fetchHousesByLandlord();
+        const response = await tenantService.fetchHousesByTenant();
         setHouses(response);
       } catch (error) {
-        console.error("Erro ao buscar casas:", error);
+        console.error("Error fetching houses:", error);
       }
     };
+
+    if (selectedHouse && selectedHouse.id) {
+      const fetchExpenses = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8000/houses/expenses/${selectedHouse.id}`
+          );
+          const pendingExpenses = response.data.filter((expense) => expense.status !== "paid");
+          setExpenses(pendingExpenses);
+        } catch (error) {
+          console.error("Error fetching expenses:", error);
+        }
+      };
+      fetchExpenses();
+      fetchIssues();
+    }
 
     fetchUserProfile();
     fetchHouses();
-  }, []); // Runs on mount
+  }, [selectedHouse]);
 
-  useEffect(() => {
-    const fetchIssues = async () => {
-      if (landlordId) {
-        try {
-          const response = await landlordService.fetchIssuesByLandlord(landlordId);
+  const fetchIssues = async () => {
+    try {
+      const response = await tenantService.fetchIssuesbyHouse(selectedHouse.id);
 
-          if (response.length > 0) {
-            console.log("Issues:", response);
-          }
+      console.log("Issues:", response);
 
-          setIssues(response);
-        } catch (error) {
-          console.error("Erro ao buscar issues:", error);
-        }
+      if (!response) {
+        toast.warning("No issues found for this house.");
       }
-    };
-
-    fetchIssues();
-  }, [landlordId]); // Runs when landlordId changes
-
-  const handleAddHouseClick = () => {
-    navigate("/tables"); // Replace '/add-house' with your desired route
-  };
-
-  const handleHouseClick = (house) => {
-    navigate("/billing", { state: { selectedHouse: house } });
+      setIssues(response);
+    } catch (error) {
+      toast.error("Error fetching issues.");
+    }
   };
 
   const handleSubmit = async (issueData) => {
@@ -159,59 +159,65 @@ function Dashboard() {
 
   return (
     <DashboardLayout>
-      <DashboardNavbar />
+      <TenantDashboardNavbar />
       <MDBox py={3}>
         <Grid container spacing={3}>
-          {/* Renderizar casas do landlord com cores alternadas */}
-          {houses.map((house, index) => (
-            <Grid item xs={12} md={6} lg={3} key={index}>
-              <MDBox
-                mb={1.5}
-                onClick={() => handleHouseClick(house)} // Pass the actual name of the house
-                style={{ cursor: "pointer" }}
-              >
-                <ComplexStatisticsCard
-                  color={colors[index % colors.length]} // Alterna entre as cores
-                  icon="house"
-                  title={house.name} // Nome da casa
-                  percentage={{
-                    amount: `${house.address},${house.city}, ${house.state}, ${house.zipcode}`,
-                  }}
-                />
-              </MDBox>
-            </Grid>
-          ))}
-
-          {/* Card para adicionar uma nova casa */}
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox
-              mb={1.5}
-              onClick={handleAddHouseClick}
-              style={{ cursor: "pointer" }}
-              id="createHouse"
-            >
-              <ComplexStatisticsCard
-                color="light"
-                icon="add"
-                title=" "
-                count=" "
-                percentage={{
-                  label: "Add House",
-                }}
-              />
-            </MDBox>
-          </Grid>
+          {/* Seções adicionais da dashboard */}
+          {houses.length > 0 ? (
+            houses.map((house, index) => (
+              <Grid item xs={12} md={6} lg={3} key={index}>
+                <MDBox
+                  mb={1.5}
+                  onClick={() => handleHouseClick(house)} // Pass the actual name of the house
+                  style={{ cursor: "pointer" }}
+                >
+                  <ComplexStatisticsCard
+                    key={house.id}
+                    color={colors[index % colors.length]} // Alterna entre as cores
+                    icon="house"
+                    title={house.name} // Nome da casa
+                    percentage={{
+                      amount: `${house.address},${house.city}, ${house.state}, ${house.zipcode}`,
+                    }}
+                  />
+                </MDBox>
+              </Grid>
+            ))
+          ) : (
+            <p>No houses found.</p>
+          )}
         </Grid>
-
-        {/* Seções adicionais da dashboard */}
+        {/* Mensagem de boas-vindas e controle de login/logout */}
+        {/* <Grid item xs={12}>
+          <MDBox textAlign="center" mt={3}>
+            {logged ? (
+              <>
+                <h3>Welcome back {userName}!</h3>
+                <LogoutButton onClick={redirectToLogout} />
+              </>
+            ) : (
+              <div>
+                <h3>Please log in to access the dashboard features.</h3>
+                <SignInButton onClick={redirectToSignIn} />
+                <SignUpButton onClick={redirectToSignIn} />
+              </div>
+            )}
+          </MDBox>
+        </Grid> */}
         <MDBox mt={4.5}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={8}>
-              <Invoices />
+              <Invoices
+                selectedHouse={selectedHouse}
+                onDetailsClick={(expenseId) => console.log(expenseId)}
+              />
             </Grid>
             <Grid item xs={12} md={6} lg={4}>
               <OrdersOverview
+                selectedHouse={selectedHouse}
+                isTenant={true}
                 issues={issues}
+                fetchIssues={fetchIssues}
                 handleSubmit={handleSubmit}
                 handleDelete={handleDelete}
               />
@@ -224,4 +230,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default TenantDashboard;

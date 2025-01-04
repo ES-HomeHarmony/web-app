@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+import tenantService from "services/tenantService";
+
 const Callback = () => {
   const navigate = useNavigate();
 
@@ -47,8 +49,13 @@ const Callback = () => {
       localStorage.setItem("id_token", id_token);
       localStorage.setItem("refresh_token", refresh_token);
 
-      // Redirect to the dashboard or wherever
-      navigate("/dashboard");
+      const role = await tenantService.fetchUserRole(); // Fetch user role
+
+      if (role === "tenant") {
+        navigate("/tenant-dashboard");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (error) {
       console.error("Error exchanging code for tokens:", error);
       // Handle errors (e.g., redirect to login)
