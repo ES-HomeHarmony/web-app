@@ -11,18 +11,15 @@ import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatist
 import Invoices from "layouts/billing/components/Invoices";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 
-import SignInButton from "../../components/SignInButton";
-import SignUpButton from "../../components/SignUpButton";
-import LogoutButton from "../../components/LogoutButton";
 import landlordService from "../../services/landlordService";
-import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 
 function Dashboard() {
-  const { sales, tasks } = reportsLineChartData;
   const navigate = useNavigate(); // Hook to navigate programmatically
   const [logged, setLogged] = useState(false);
   const [userName, setUserName] = useState("");
   const [houses, setHouses] = useState([]);
+  const [landlordId, setLandlordId] = useState("");
+  const [issues, setIssues] = useState([]);
 
   const colors = ["primary", "info", "success", "warning", "error"]; // Array de cores alternadas
 
@@ -51,8 +48,9 @@ function Dashboard() {
             withCredentials: true,
           });
 
-          if (response.data?.name) {
+          if (response.data) {
             setUserName(response.data.name);
+            setLandlordId(response.data.cognito_id);
             setLogged(true);
           }
         } catch (error) {
@@ -75,7 +73,27 @@ function Dashboard() {
 
     fetchUserProfile();
     fetchHouses();
-  }, []);
+  }, []); // Runs on mount
+
+  useEffect(() => {
+    const fetchIssues = async () => {
+      if (landlordId) {
+        try {
+          const response = await landlordService.fetchIssuesByLandlord(landlordId);
+
+          if (response.length > 0) {
+            console.log("Issues:", response);
+          }
+
+          setIssues(response);
+        } catch (error) {
+          console.error("Erro ao buscar issues:", error);
+        }
+      }
+    };
+
+    fetchIssues();
+  }, [landlordId]); // Runs when landlordId changes
 
   const handleAddHouseClick = () => {
     navigate("/tables"); // Replace '/add-house' with your desired route
@@ -84,6 +102,61 @@ function Dashboard() {
   const handleHouseClick = (house) => {
     navigate("/billing", { state: { selectedHouse: house } });
   };
+
+  const handleSubmit = async (issueData) => {
+    if (!selectedHouse || !selectedHouse.id) {
+      toast.error("Please select a house before creating an issue.");
+      return;
+    }
+
+    console.log("New Issue Data before submission:", issueData);
+
+    // Add the selected house ID to the issue data
+    const dataToSubmit = { ...issueData, house_id: selectedHouse.id };
+
+    if (!dataToSubmit.title) {
+      toast.error("Title is required.");
+      return;
+    }
+
+    if (!dataToSubmit.description) {
+      toast.error("Description is required.");
+      return;
+    }
+
+    try {
+      if (dataToSubmit.id) {
+        await tenantService.updateIssue(dataToSubmit);
+        toast.success("Issue updated successfully.");
+      } else {
+        await tenantService.createIssue(dataToSubmit);
+        toast.success("Issue created successfully.");
+      }
+      await fetchIssues();
+    } catch (error) {
+      console.error("Error saving issue:", error);
+      toast.error("Error saving issue.");
+    }
+  };
+
+  const handleDelete = async (issueId) => {
+    // Display a confirmation alert
+    if (
+      !window.confirm("Are you sure you want to delete this issue? This action cannot be undone.")
+    ) {
+      return; // Exit if the user cancels
+    }
+
+    try {
+      // Proceed with deletion if confirmed
+      await tenantService.deleteIssue(issueId);
+      toast.success("Issue deleted successfully.");
+      await fetchIssues(); // Refresh the issue list
+    } catch (error) {
+      toast.error("Error deleting issue.");
+    }
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -128,24 +201,6 @@ function Dashboard() {
               />
             </MDBox>
           </Grid>
-
-          {/* Mensagem de boas-vindas e controle de login/logout */}
-          {/* <Grid item xs={12}>
-            <MDBox textAlign="center" mt={3}>
-              {logged ? (
-                <>
-                  <h3>Welcome back {userName}!</h3>
-                  <LogoutButton onClick={redirectToLogout} />
-                </>
-              ) : (
-                <div>
-                  <h3>Please log in to access the dashboard features.</h3>
-                  <SignInButton onClick={redirectToSignIn} />
-                  <SignUpButton onClick={redirectToSignIn} />
-                </div>
-              )}
-            </MDBox>
-          </Grid> */}
         </Grid>
 
         {/* Seções adicionais da dashboard */}
@@ -155,7 +210,11 @@ function Dashboard() {
               <Invoices />
             </Grid>
             <Grid item xs={12} md={6} lg={4}>
-              <OrdersOverview />
+              <OrdersOverview
+                issues={issues}
+                handleSubmit={handleSubmit}
+                handleDelete={handleDelete}
+              />
             </Grid>
           </Grid>
         </MDBox>

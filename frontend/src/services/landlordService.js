@@ -32,20 +32,48 @@ export async function fetchHousesByLandlord() {
 }
 
 // Função para buscar a casa associada a um tenant específico
-// export async function fetchHousesByTenant() {
-//   try {
-//     const response = await axios.get(`${API_URL}/houses/tenant`, {
-//       withCredentials: true, // Inclui cookies de autenticação
-//     });
-//     return response.data; // Retorna os dados em JSON
-//   } catch (error) {
-//     console.error("Erro ao buscar casa(s):", error);
-//     throw error;
-//   }
-// }
+export async function getHouseById(house_id) {
+  try {
+    const response = await axios.get(`${API_URL}/houses/landlord/house/${house_id}`, {
+      withCredentials: true, // Inclui cookies de autenticação
+    });
+    return response.data; // Retorna os dados em JSON
+  } catch (error) {
+    console.error("Erro ao buscar casa(s):", error);
+    throw error;
+  }
+}
+
+// Função para buscar as issues associadas a um landlord específico
+export async function fetchIssuesByLandlord(landlordId) {
+  try {
+    const response = await axios.get(`${API_URL}/tenants/landlords/${landlordId}/issues`, {
+      withCredentials: true, // Inclui cookies de autenticação
+    });
+    return response.data; // Retorna os dados em JSON
+  } catch (error) {
+    console.error("Erro ao buscar issues:", error);
+    throw error;
+  }
+}
+
+// Função para editar o status de uma issue
+export async function editIssueStatus(issueData) {
+  try {
+    const response = await axios.put(`${API_URL}/tenants/updateIssue`, issueData, {
+      withCredentials: true, // Inclui cookies de autenticação
+    });
+    return response.data; // Retorna os dados em JSON
+  } catch (error) {
+    console.error("Erro ao editar o status da issue:", error);
+    throw error;
+  }
+}
 
 export default {
   createHouse,
   fetchHousesByLandlord,
-  // fetchHousesByTenant,
+  getHouseById,
+  fetchIssuesByLandlord,
+  editIssueStatus,
 };

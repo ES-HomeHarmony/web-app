@@ -117,7 +117,7 @@ function OrdersOverview({
                   : "check_circle"
               }
               title={issue.title}
-              dateTime={new Date(issue.created_at).toLocaleString()}
+              dateTime={new Date(issue.created_at).toLocaleDateString()}
               description={
                 <MDBox display="flex" justifyContent="space-between" alignItems="center">
                   <span>{issue.description}</span>
