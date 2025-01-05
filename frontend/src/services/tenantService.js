@@ -6,12 +6,25 @@ const API_URL = "http://localhost:8000";
 export const fetchUserRole = async () => {
   try {
     const response = await axios.get(`${API_URL_USERS}/user/profile`, {
-      withCredentials: true, // Inclui cookies de autenticação
+      withCredentials: true,
     });
     console.log("User role:", response.data.role);
     return response.data.role; // Assuming backend returns { role: "tenant" }
   } catch (error) {
     console.error("Error fetching user role:", error);
+    throw error;
+  }
+};
+
+export const fetchTenantId = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/tenants/tenantId`, {
+      withCredentials: true,
+    });
+    console.log("Tenant ID:", response.data.id);
+    return response.data.id;
+  } catch (error) {
+    console.error("Error fetching tenant ID:", error);
     throw error;
   }
 };
@@ -81,4 +94,5 @@ export default {
   createIssue,
   updateIssue,
   deleteIssue,
+  fetchTenantId,
 };

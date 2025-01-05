@@ -9,6 +9,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress"; // Import for spinner
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -24,19 +25,20 @@ import Invoices from "layouts/billing/components/Invoices";
 import BillingInformation from "layouts/billing/components/BillingInformation";
 import Transactions from "layouts/billing/components/Transactions";
 import Payments from "layouts/billing/components/Payments";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 function Billing() {
   const location = useLocation();
-  const navigate = useNavigate();
   const [selectedHouse, setSelectedHouse] = useState("");
   const [houses, setHouses] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [tenants, setTenants] = useState([]); // New state for tenants
-  const [houseSelected, setHouseSelected] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tenantData, setTenantData] = useState({ name: "", email: "", rent: "" });
+  const [isLoading, setIsLoading] = useState(false); // New state for loading
+  const [isLoadingtenantsExpense, setIsLoadingtenantsExpense] = useState(false); // New state for loading
+  const [tenantsExpense, setTenantsExpense] = useState([]); // New state for tenants
 
   // Modal styles
   const modalStyle = {
@@ -85,7 +87,10 @@ function Billing() {
 
   useEffect(() => {
     const fetchTenants = async () => {
-      if (houseSelected) {
+      // sleep of 10s
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setIsLoading(true); // Start loading
+      if (selectedHouse && selectedHouse.id) {
         try {
           const response = await axios.get(
             `http://localhost:8000/houses/landlord/house/${selectedHouse.id}`,
@@ -93,11 +98,15 @@ function Billing() {
               withCredentials: true,
             }
           );
+          const tenant_data = response.data?.tenents || []; // Default to empty array if undefined
           console.log("Fetched tenants:", response.data.tenents); // Debug line
-          setTenants(response.data.tenents);
+          setTenants(tenant_data);
         } catch (error) {
           console.error("Error fetching tenants:", error);
           toast.error("Failed to fetch tenants. Please try again.");
+          setTenants([]);
+        } finally {
+          setIsLoading(false); // End loading
         }
       } else {
         setTenants([]);
@@ -105,7 +114,7 @@ function Billing() {
     };
 
     fetchTenants();
-  }, [houseSelected]);
+  }, [selectedHouse]);
 
   const addInvoice = (expenseType, price, deadline, file) => {
     const newInvoice = {
@@ -120,15 +129,18 @@ function Billing() {
 
   const handleSelectExpense = async (expenseId) => {
     setSelectedExpense(expenseId);
+    setIsLoadingtenantsExpense(true); // Start loading
     try {
       const response = await axios.get(`http://localhost:8000/houses/expense/${expenseId}`);
       if (response.data && response.data.tenants) {
-        setTenants(response.data.tenants); // Set tenants for the selected expense
+        setTenantsExpense(response.data.tenants); // Set tenants for the selected expense
       } else {
         console.warn("No tenant data received for the selected expense");
       }
     } catch (error) {
       console.error("Error fetching tenant payment status:", error);
+    } finally {
+      setIsLoadingtenantsExpense(false); // End loading
     }
   };
 
@@ -229,7 +241,11 @@ function Billing() {
               />
             </Grid>
             <Grid item xs={12} xl={3}>
-              <Payments tenants={tenants} selectedExpense={selectedExpense} />
+              <Payments
+                tenants={tenantsExpense}
+                selectedExpense={selectedExpense}
+                isLoading={isLoadingtenantsExpense}
+              />
             </Grid>
           </Grid>
         </MDBox>
@@ -243,18 +259,29 @@ function Billing() {
                 Tenants
               </MDTypography>
               <MDBox>
-                {selectedHouse &&
-                  tenants.map((tenant) => (
-                    <MDBox key={tenant.id} mb={2}>
-                      <MDTypography variant="h6">{tenant.name}</MDTypography>
+                {selectedHouse && (
+                  <MDBox>
+                    {isLoading ? (
+                      <CircularProgress />
+                    ) : tenants.length > 0 ? (
+                      tenants.map((tenant) => (
+                        <MDBox key={tenant.id} mb={2}>
+                          <MDTypography variant="h6">{tenant.name}</MDTypography>
+                          <MDTypography variant="body2" color="textSecondary">
+                            {tenant.email}
+                          </MDTypography>
+                          <MDTypography variant="body2" color="textSecondary">
+                            Rent: €{tenant.rent}
+                          </MDTypography>
+                        </MDBox>
+                      ))
+                    ) : (
                       <MDTypography variant="body2" color="textSecondary">
-                        {tenant.email}
+                        No tenants found.
                       </MDTypography>
-                      <MDTypography variant="body2" color="textSecondary">
-                        Rent: €{tenant.rent}
-                      </MDTypography>
-                    </MDBox>
-                  ))}
+                    )}
+                  </MDBox>
+                )}
               </MDBox>
             </Grid>
           </Grid>
@@ -300,6 +327,7 @@ function Billing() {
           </MDBox>
         </Box>
       </Modal>
+      <ToastContainer />
       <Footer />
     </DashboardLayout>
   );

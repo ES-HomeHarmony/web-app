@@ -7,7 +7,7 @@ import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "examples/Footer";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
-import Invoices from "layouts/billing/components/Invoices";
+import Invoices from "layouts/tenant_dashboard/components/Invoices";
 import OrdersOverview from "layouts/tenant_dashboard/components/OrdersOverview";
 import TenantDashboardNavbar from "examples/Navbars/TenantDashboardNavbar";
 
