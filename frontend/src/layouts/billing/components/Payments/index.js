@@ -6,8 +6,9 @@ import Icon from "@mui/material/Icon";
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import MDButton from "components/MDButton";
 import { useEffect, useState } from "react";
+import CircularProgress from "@mui/material/CircularProgress";
 
-function Payments({ tenants = [], selectedExpense }) {
+function Payments({ tenants = [], selectedExpense, isLoading }) {
   const [expenseTenantStatuses, setExpenseTenantStatuses] = useState([]);
 
   useEffect(() => {
@@ -15,7 +16,7 @@ function Payments({ tenants = [], selectedExpense }) {
     console.log("Tenants:", tenants);
     if (selectedExpense && tenants.length > 0) {
       const formattedTenantStatuses = tenants.map((tenant) => ({
-        name: `Tenant ${tenant.tenant_id}`, // Replace with actual tenant name if available
+        name: `Tenant ${tenant.tenant_name}`, // Replace with actual tenant name if available
         status: tenant.status === "paid" ? "green" : "red",
       }));
       setExpenseTenantStatuses(formattedTenantStatuses);
@@ -32,7 +33,9 @@ function Payments({ tenants = [], selectedExpense }) {
         </MDTypography>
       </MDBox>
       <MDBox p={2}>
-        {selectedExpense && expenseTenantStatuses.length > 0 ? (
+        {isLoading ? ( // Show loading indicator
+          <CircularProgress />
+        ) : selectedExpense && expenseTenantStatuses.length > 0 ? (
           expenseTenantStatuses.map((tenantStatus, tenantIndex) => (
             <MDBox
               key={tenantIndex}
@@ -81,6 +84,7 @@ Payments.propTypes = {
     })
   ).isRequired,
   selectedExpense: PropTypes.string, // Selected expense ID or identifier
+  isLoading: PropTypes.bool,
 };
 
 export default Payments;
