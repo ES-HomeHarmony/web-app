@@ -25,7 +25,7 @@ import Invoices from "layouts/billing/components/Invoices";
 import BillingInformation from "layouts/billing/components/BillingInformation";
 import Transactions from "layouts/billing/components/Transactions";
 import Payments from "layouts/billing/components/Payments";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 function Billing() {
   const location = useLocation();
@@ -87,8 +87,10 @@ function Billing() {
 
   useEffect(() => {
     const fetchTenants = async () => {
+      // sleep of 10s
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setIsLoading(true); // Start loading
       if (selectedHouse && selectedHouse.id) {
-        setIsLoading(true); // Start loading
         try {
           const response = await axios.get(
             `http://localhost:8000/houses/landlord/house/${selectedHouse.id}`,
@@ -96,11 +98,13 @@ function Billing() {
               withCredentials: true,
             }
           );
+          const tenant_data = response.data?.tenents || []; // Default to empty array if undefined
           console.log("Fetched tenants:", response.data.tenents); // Debug line
-          setTenants(response.data.tenents);
+          setTenants(tenant_data);
         } catch (error) {
           console.error("Error fetching tenants:", error);
           toast.error("Failed to fetch tenants. Please try again.");
+          setTenants([]);
         } finally {
           setIsLoading(false); // End loading
         }
@@ -257,9 +261,9 @@ function Billing() {
               <MDBox>
                 {selectedHouse && (
                   <MDBox>
-                    {isLoading ? ( // Show loading indicator
+                    {isLoading ? (
                       <CircularProgress />
-                    ) : (
+                    ) : tenants.length > 0 ? (
                       tenants.map((tenant) => (
                         <MDBox key={tenant.id} mb={2}>
                           <MDTypography variant="h6">{tenant.name}</MDTypography>
@@ -271,6 +275,10 @@ function Billing() {
                           </MDTypography>
                         </MDBox>
                       ))
+                    ) : (
+                      <MDTypography variant="body2" color="textSecondary">
+                        No tenants found.
+                      </MDTypography>
                     )}
                   </MDBox>
                 )}
@@ -319,6 +327,7 @@ function Billing() {
           </MDBox>
         </Box>
       </Modal>
+      <ToastContainer />
       <Footer />
     </DashboardLayout>
   );

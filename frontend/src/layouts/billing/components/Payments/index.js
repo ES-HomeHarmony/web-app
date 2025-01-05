@@ -56,14 +56,14 @@ function Payments({ tenants = [], selectedExpense, isLoading }) {
               <MDTypography variant="caption" color={tenantStatus.status} fontWeight="medium">
                 {tenantStatus.status === "green" ? "Paid" : "Not Paid"}
               </MDTypography>
-              {tenantStatus.status === "red" && (
+              {/* {tenantStatus.status === "red" && (
                 <MDButton variant="outlined" color="error">
                   <AddAlertOutlinedIcon fontSize="small" color="error">
                     add_alert_outlined
                   </AddAlertOutlinedIcon>{" "}
                   Notify
                 </MDButton>
-              )}
+              )} */}
             </MDBox>
           ))
         ) : (
