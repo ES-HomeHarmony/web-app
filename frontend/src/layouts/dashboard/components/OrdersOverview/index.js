@@ -56,6 +56,24 @@ function OrdersOverview({ issues }) {
     }
   }, [issues]);
 
+  const handleEditIssueStatus = async (issueId, status) => {
+    const issueData = {
+      id: issueId,
+      status: status,
+    };
+
+    try {
+      const response = await landlordService.editIssueStatus(issueData);
+      if (response) {
+        toast.success("Issue status updated successfully !");
+      } else {
+        toast.error("Error updating issue status !");
+      }
+    } catch (error) {
+      toast.error("Error updating issue status !");
+    }
+  };
+
   return (
     <Card sx={{ height: "100%" }}>
       <MDBox pt={3} px={3}>
