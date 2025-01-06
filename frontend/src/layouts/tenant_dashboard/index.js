@@ -196,30 +196,30 @@ function TenantDashboard() {
           )}
         </Grid>
         <MDBox mt={4.5}>
-          <Grid item xs={12} md={6} lg={4}>
-            <MDBox textAlign="center">
-              <Button
-                variant="text"
-                color="primary"
-                startIcon={<VisibilityIcon />}
-                onClick={fecthContract}
-                sx={{
-                  textTransform: "none",
-                  fontSize: "1rem",
-                  padding: "10px 20px",
-                  borderRadius: "8px",
-                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-                  "&.MuiButton-containedPrimary": {
-                    color: "white", // Ensure text is white for the primary button variant
-                  },
-                  float: "left",
-                  mb: 1,
-                }}
-              >
-                See Contract
-              </Button>
-            </MDBox>
-          </Grid>
+          {selectedHouse && selectedHouse.id ? (
+            <Grid item xs={12} md={6} lg={4}>
+              <MDBox textAlign="center">
+                <Button
+                  variant="contained" // Use "contained" for a filled button
+                  color="primary" // Use primary theme color
+                  startIcon={<VisibilityIcon />} // Add an icon to the left
+                  onClick={fecthContract}
+                  sx={{
+                    textTransform: "none", // Prevent text capitalization
+                    fontSize: "1rem", // Adjust font size
+                    padding: "10px 20px", // Add padding
+                    borderRadius: "8px", // Rounded corners
+                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Shadow for depth
+                    color: "white", // Force text color to white
+                    float: "left", // Align left
+                    mb: 1, // Add margin below
+                  }}
+                >
+                  See Contract
+                </Button>
+              </MDBox>
+            </Grid>
+          ) : null}
         </MDBox>
         <MDBox mt={4.5}>
           <Grid container spacing={3}>
