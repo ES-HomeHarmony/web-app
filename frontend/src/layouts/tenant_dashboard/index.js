@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Grid from "@mui/material/Grid";
 
@@ -10,9 +9,10 @@ import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatist
 import Invoices from "layouts/billing/components/Invoices";
 import OrdersOverview from "layouts/tenant_dashboard/components/OrdersOverview";
 import TenantDashboardNavbar from "examples/Navbars/TenantDashboardNavbar";
+import Button from "@mui/material/Button";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 import tenantService from "services/tenantService";
-import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 import { toast } from "react-toastify";
 
 function TenantDashboard() {
@@ -157,6 +157,14 @@ function TenantDashboard() {
     }
   };
 
+  const fecthContract = async () => {
+    try {
+      await tenantService.fetchContract();
+    } catch (error) {
+      console.error("Error fetching contract:", error);
+    }
+  };
+
   return (
     <DashboardLayout>
       <TenantDashboardNavbar />
@@ -187,23 +195,32 @@ function TenantDashboard() {
             <p>No houses found.</p>
           )}
         </Grid>
-        {/* Mensagem de boas-vindas e controle de login/logout */}
-        {/* <Grid item xs={12}>
-          <MDBox textAlign="center" mt={3}>
-            {logged ? (
-              <>
-                <h3>Welcome back {userName}!</h3>
-                <LogoutButton onClick={redirectToLogout} />
-              </>
-            ) : (
-              <div>
-                <h3>Please log in to access the dashboard features.</h3>
-                <SignInButton onClick={redirectToSignIn} />
-                <SignUpButton onClick={redirectToSignIn} />
-              </div>
-            )}
-          </MDBox>
-        </Grid> */}
+        <MDBox mt={4.5}>
+          <Grid item xs={12} md={6} lg={4}>
+            <MDBox textAlign="center">
+              <Button
+                variant="text"
+                color="primary"
+                startIcon={<VisibilityIcon />}
+                onClick={fecthContract}
+                sx={{
+                  textTransform: "none",
+                  fontSize: "1rem",
+                  padding: "10px 20px",
+                  borderRadius: "8px",
+                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                  "&.MuiButton-containedPrimary": {
+                    color: "white", // Ensure text is white for the primary button variant
+                  },
+                  float: "left",
+                  mb: 1,
+                }}
+              >
+                See Contract
+              </Button>
+            </MDBox>
+          </Grid>
+        </MDBox>
         <MDBox mt={4.5}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={8}>
