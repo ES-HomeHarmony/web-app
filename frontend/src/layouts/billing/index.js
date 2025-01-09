@@ -25,7 +25,7 @@ import Invoices from "layouts/billing/components/Invoices";
 import BillingInformation from "layouts/billing/components/BillingInformation";
 import Transactions from "layouts/billing/components/Transactions";
 import Payments from "layouts/billing/components/Payments";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 function Billing() {
   const location = useLocation();
@@ -231,19 +231,22 @@ function Billing() {
         <MDBox mb={3}>
           <Grid container spacing={3}>
             <Grid item xs={12} xl={5}>
-              <BillingInformation selectedHouse={selectedHouse} addInvoice={addInvoice} />
+              <BillingInformation
+                selectedHouse={selectedHouse || {}} // Fallback em caso de null
+                addInvoice={addInvoice}
+              />
             </Grid>
             <Grid item xs={12} xl={4}>
               <Invoices
                 invoices={invoices}
-                selectedHouse={selectedHouse}
+                selectedHouse={selectedHouse || {}} // Verificação para evitar null
                 onDetailsClick={handleSelectExpense}
               />
             </Grid>
             <Grid item xs={12} xl={3}>
               <Payments
-                tenants={tenantsExpense}
-                selectedExpense={selectedExpense}
+                tenants={tenantsExpense || []} // Verificação para garantir array válido
+                selectedExpense={selectedExpense || {}} // Evitar null
                 isLoading={isLoadingtenantsExpense}
               />
             </Grid>
@@ -327,7 +330,6 @@ function Billing() {
           </MDBox>
         </Box>
       </Modal>
-      <ToastContainer />
       <Footer />
     </DashboardLayout>
   );

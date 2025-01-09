@@ -9,7 +9,7 @@ import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import Icon from "@mui/material/Icon";
 
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 import tenantService from "services/tenantService";
 
@@ -268,10 +268,6 @@ function Invoices({ selectedHouse, onDetailsClick }) {
           ))}
         </MDBox>
       </MDBox>
-      <div>
-        {/* Your existing code */}
-        <ToastContainer />
-      </div>
     </Card>
   );
 }
