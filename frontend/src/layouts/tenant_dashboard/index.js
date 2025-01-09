@@ -162,6 +162,7 @@ function TenantDashboard() {
       await tenantService.fetchContract();
     } catch (error) {
       console.error("Error fetching contract:", error);
+      toast.error("Error fetching contract. Contract not found.");
     }
   };
 
