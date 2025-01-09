@@ -1,39 +1,29 @@
-# Stage 1: Build the React app
-FROM --platform=linux/amd64 node:18-alpine AS builder
+# Use uma imagem leve do Node.js para a construção da aplicação
+FROM node:20-alpine AS builder
 
-# Set the working directory
+# Diretório de trabalho para o builder
 WORKDIR /usr/src/app
 
-# Copy the package.json and package-lock.json
+# Copie apenas os arquivos necessários para instalar dependências
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Instale dependências
+RUN npm install --production
 
-# Copy the rest of the application code
+# Copie o código-fonte para o builder
 COPY . .
 
-# Build the app
+# Compile a aplicação para produção
 RUN npm run build
 
-# Stage 2: Serve the React app with Nginx
-FROM --platform=linux/amd64 nginx:alpine
+# Segunda etapa: Usar Nginx para servir os arquivos estáticos
+FROM nginx:alpine
 
-# Set the working directory for nginx configuration
-WORKDIR /etc/nginx
-
-# Copy the build output from the previous stage
+# Copie os arquivos de build do builder para o diretório padrão do Nginx
 COPY --from=builder /usr/src/app/build /usr/share/nginx/html
 
-# Copy the SSL certificate and key
-COPY certificate.crt /etc/ssl/certificate.crt
-COPY private.key /etc/ssl/private.key
+# Exponha a porta padrão do Nginx
+EXPOSE 80
 
-# Copy custom nginx config file to enable HTTPS
-COPY nginx.conf /etc/nginx/nginx.conf
-
-# Expose port 443 for HTTPS
-EXPOSE 443
-
-# Start nginx server
+# Comando para iniciar o Nginx
 CMD ["nginx", "-g", "daemon off;"]

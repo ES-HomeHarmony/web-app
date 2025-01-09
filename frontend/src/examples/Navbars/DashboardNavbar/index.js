@@ -333,11 +333,13 @@ function DashboardNavbar({ absolute, light, isMini }) {
   });
 
   function redirectToSignIn() {
-    window.location.href = "http://localhost:8001/auth/login";
+    window.location.href =
+      "http://userservice-alb-883434472.eu-north-1.elb.amazonaws.com/userservice/auth/login";
   }
 
   async function redirectToLogout() {
-    window.location.href = "http://localhost:8001/auth/logout";
+    window.location.href =
+      "http://userservice-alb-883434472.eu-north-1.elb.amazonaws.com/userservice/auth/logout";
   }
 
   useEffect(() => {
@@ -353,9 +355,12 @@ function DashboardNavbar({ absolute, light, isMini }) {
 
       if (accessToken) {
         try {
-          const response = await axios.get("http://localhost:8001/user/profile", {
-            withCredentials: true,
-          });
+          const response = await axios.get(
+            "http://userservice-alb-883434472.eu-north-1.elb.amazonaws.com/userservice/user/profile",
+            {
+              withCredentials: true,
+            }
+          );
 
           if (response.data?.name) {
             setUserName(response.data.name);

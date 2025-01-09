@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8000";
+const API_URL = "http://housemanagement-alb-2122003581.eu-north-1.elb.amazonaws.com";
 
 // Função para criar uma nova casa para o landlord
 export async function createHouse(houseData) {

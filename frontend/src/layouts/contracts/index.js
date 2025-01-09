@@ -32,9 +32,12 @@ function Billing() {
   useEffect(() => {
     const fetchHouses = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/houses/landlord", {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          "http://housemanagement-alb-2122003581.eu-north-1.elb.amazonaws.com/houses/landlord",
+          {
+            withCredentials: true,
+          }
+        );
         console.log("Fetched houses:", response.data); // Debug line
         setHouses(response.data);
       } catch (error) {
@@ -56,7 +59,7 @@ function Billing() {
       if (selectedHouse && selectedHouse.id) {
         try {
           const response = await axios.get(
-            `http://localhost:8000/houses/landlord/house/${selectedHouse.id}`,
+            `http://housemanagement-alb-2122003581.eu-north-1.elb.amazonaws.com/houses/landlord/house/${selectedHouse.id}`,
             { withCredentials: true }
           );
           if (response.data.tenents) {

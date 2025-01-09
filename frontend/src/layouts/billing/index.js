@@ -64,9 +64,12 @@ function Billing() {
   useEffect(() => {
     const fetchHouses = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/houses/landlord", {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          "http://housemanagement-alb-2122003581.eu-north-1.elb.amazonaws.com/houses/landlord",
+          {
+            withCredentials: true,
+          }
+        );
         console.log("Fetched houses:", response.data); // Debug line
         setHouses(response.data);
       } catch (error) {
@@ -88,7 +91,7 @@ function Billing() {
       if (houseSelected) {
         try {
           const response = await axios.get(
-            `http://localhost:8000/houses/landlord/house/${selectedHouse.id}`,
+            `http://housemanagement-alb-2122003581.eu-north-1.elb.amazonaws.com/houses/landlord/house/${selectedHouse.id}`,
             {
               withCredentials: true,
             }
@@ -121,7 +124,9 @@ function Billing() {
   const handleSelectExpense = async (expenseId) => {
     setSelectedExpense(expenseId);
     try {
-      const response = await axios.get(`http://localhost:8000/houses/expense/${expenseId}`);
+      const response = await axios.get(
+        `http://housemanagement-alb-2122003581.eu-north-1.elb.amazonaws.com/houses/expense/${expenseId}`
+      );
       if (response.data && response.data.tenants) {
         setTenants(response.data.tenants); // Set tenants for the selected expense
       } else {
@@ -156,9 +161,13 @@ function Billing() {
     console.log(new_tenant);
 
     try {
-      const response = await axios.post("http://localhost:8000/houses/tenents", new_tenant, {
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        "http://housemanagement-alb-2122003581.eu-north-1.elb.amazonaws.com/houses/tenents",
+        new_tenant,
+        {
+          withCredentials: true,
+        }
+      );
       console.log("Tenant created response:", response);
       toast.success("Tenant added successfully!");
       setTenantData({ name: "", email: "", rent: "" }); // Reset form

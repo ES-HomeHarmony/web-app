@@ -29,9 +29,12 @@ function Overview() {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get("http://localhost:8001/user/profile", {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          "http://userservice-alb-883434472.eu-north-1.elb.amazonaws.com/userservice/user/profile",
+          {
+            withCredentials: true,
+          }
+        );
 
         const { name, email, role } = response.data;
         setProfile({ name, email, role }); // Update state with user data
@@ -64,7 +67,7 @@ function Overview() {
 
       // Send updated data to FastAPI
       await axios.put(
-        "http://localhost:8000/user/profile/update", // Update endpoint in your FastAPI app
+        "http://housemanagement-alb-2122003581.eu-north-1.elb.amazonaws.com/user/profile/update", // Update endpoint in your FastAPI app
         {
           name: profile.name, // Make sure this matches the UpdateProfileSchema in your FastAPI backend
           email: profile.email,

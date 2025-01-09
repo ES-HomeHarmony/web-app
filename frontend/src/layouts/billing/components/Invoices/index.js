@@ -17,7 +17,7 @@ function Invoices({ selectedHouse, onDetailsClick }) {
     try {
       // Faz a requisição para o backend
       const response = await axios.get(
-        `http://localhost:8000/houses/expenses/${expenseId}/download`,
+        `http://housemanagement-alb-2122003581.eu-north-1.elb.amazonaws.com/houses/expenses/${expenseId}/download`,
         { responseType: "arraybuffer" } // Recebe o arquivo como arraybuffer
       );
 
@@ -40,7 +40,7 @@ function Invoices({ selectedHouse, onDetailsClick }) {
       const fetchExpenses = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8000/houses/expenses/${selectedHouse.id}`
+            `http://housemanagement-alb-2122003581.eu-north-1.elb.amazonaws.com/houses/expenses/${selectedHouse.id}`
           );
           const pendingExpenses = response.data.filter((expense) => expense.status !== "paid");
           setExpenses(pendingExpenses);
@@ -55,7 +55,9 @@ function Invoices({ selectedHouse, onDetailsClick }) {
   const handleDetailsClick = async (expenseId) => {
     try {
       // Fetch tenant payment statuses for the selected expense
-      const response = await axios.get(`http://localhost:8000/houses/expense/${expenseId}`);
+      const response = await axios.get(
+        `http://housemanagement-alb-2122003581.eu-north-1.elb.amazonaws.com/houses/expense/${expenseId}`
+      );
 
       console.log("Tenant data for expense:", response.data); // Debug line
 
@@ -66,7 +68,9 @@ function Invoices({ selectedHouse, onDetailsClick }) {
 
         if (allPaid) {
           // Update the status of the expense to 'paid'
-          await axios.put(`http://localhost:8000/houses/expenses/${expenseId}/mark-paid`);
+          await axios.put(
+            `http://housemanagement-alb-2122003581.eu-north-1.elb.amazonaws.com/houses/expenses/${expenseId}/mark-paid`
+          );
         }
       } else {
         console.warn("No tenant data received for the selected expense");
@@ -74,7 +78,7 @@ function Invoices({ selectedHouse, onDetailsClick }) {
 
       // Refresh invoices to reflect any changes
       const updatedInvoicesResponse = await axios.get(
-        `http://localhost:8000/houses/expenses/${selectedHouse.id}`
+        `http://housemanagement-alb-2122003581.eu-north-1.elb.amazonaws.com/houses/expenses/${selectedHouse.id}`
       );
       const pendingExpenses = updatedInvoicesResponse.data.filter(
         (expense) => expense.status !== "paid"

@@ -23,7 +23,8 @@ const Callback = () => {
 
   const exchangeCodeForTokens = async (code) => {
     const clientId = "1ks0163ckccdfje0a1h7h78ffl"; // Your Cognito App Client ID
-    const redirectUri = "http://localhost:3000"; // The same as used during login
+    const redirectUri =
+      "http://userservice-alb-883434472.eu-north-1.elb.amazonaws.com/userservice/auth/login"; // The same as used during login
 
     // Request to exchange authorization code for tokens
     const data = {

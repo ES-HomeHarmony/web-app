@@ -42,9 +42,12 @@ function TenantDashboard() {
 
       if (accessToken) {
         try {
-          const response = await axios.get("http://localhost:8001/user/profile", {
-            withCredentials: true,
-          });
+          const response = await axios.get(
+            "http://userservice-alb-883434472.eu-north-1.elb.amazonaws.com/userservice/user/profile",
+            {
+              withCredentials: true,
+            }
+          );
 
           if (response.data?.name) {
             setUserName(response.data.name);
@@ -72,7 +75,7 @@ function TenantDashboard() {
       const fetchExpenses = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8000/houses/expenses/${selectedHouse.id}`
+            `http://housemanagement-alb-2122003581.eu-north-1.elb.amazonaws.com/houses/expenses/${selectedHouse.id}`
           );
           const pendingExpenses = response.data.filter((expense) => expense.status !== "paid");
           setExpenses(pendingExpenses);

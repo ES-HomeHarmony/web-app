@@ -15,7 +15,7 @@ function PaidExpenses({ selectedHouse }) {
       const fetchPaidExpenses = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8000/houses/expenses/${selectedHouse.id}`
+            `http://housemanagement-alb-2122003581.eu-north-1.elb.amazonaws.com/houses/expenses/${selectedHouse.id}`
           );
 
           const filteredExpenses = response.data.filter((expense) => expense.status === "paid");

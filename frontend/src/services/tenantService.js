@@ -1,13 +1,25 @@
 import axios from "axios";
 
-const API_URL_USERS = "http://localhost:8001";
-const API_URL = "http://localhost:8000";
+const API_URL_USERS = "http://userservice-alb-883434472.eu-north-1.elb.amazonaws.com/userservice";
+const API_URL = "http://housemanagement-alb-2122003581.eu-north-1.elb.amazonaws.com";
 
 export const fetchUserRole = async () => {
   try {
-    const response = await axios.get(`${API_URL_USERS}/user/profile`, {
-      withCredentials: true, // Inclui cookies de autenticação
-    });
+    // const response = await axios.get(`${API_URL_USERS}/user/profile`, {
+    //   withCredentials: true, // Inclui cookies de autenticação
+    // });
+
+    const response = await axios.get(
+      "https://corsproxy.io/?https://webhook.site/93246c42-8baa-487f-b78a-30da12995e38",
+      {
+        withCredentials: true, // Inclui cookies de autenticação
+        headers: new Headers({
+          "Access-Control-Allow-Origin":
+            "https://alb-frontend-249540307.eu-north-1.elb.amazonaws.com",
+        }),
+      }
+    );
+
     console.log("User role:", response.data.role);
     return response.data.role; // Assuming backend returns { role: "tenant" }
   } catch (error) {

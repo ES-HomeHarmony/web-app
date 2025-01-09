@@ -46,11 +46,15 @@ function BillingInformation({ selectedHouse, addInvoice }) {
 
     // Make the POST request
     axios
-      .post("http://localhost:8000/houses/addExpense", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
+      .post(
+        "http://housemanagement-alb-2122003581.eu-north-1.elb.amazonaws.com/houses/addExpense",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
       .then((response) => {
         toast.success("Expense added successfully!");
         addInvoice(expenseType, price, deadline, selectedFile);

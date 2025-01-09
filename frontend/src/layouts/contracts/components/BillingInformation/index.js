@@ -46,12 +46,16 @@ function BillingInformation({ tenants, selectedHouse }) {
     formData.append("file", selectedFile);
 
     try {
-      const response = await axios.post("http://localhost:8000/houses/uploadContract", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        "http://housemanagement-alb-2122003581.eu-north-1.elb.amazonaws.com/houses/uploadContract",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
 
       if (response.status === 200 || response.status === 201) {
         toast.success("Contract uploaded successfully!");
