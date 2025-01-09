@@ -88,7 +88,6 @@ export async function fetchContract() {
     window.open(url, "_blank");
   } catch (error) {
     console.error("Error fetching contract:", error);
-    alert("Error fetching the PDF");
     throw error;
   }
 }
