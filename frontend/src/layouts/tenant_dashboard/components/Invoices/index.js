@@ -16,23 +16,20 @@ import tenantService from "services/tenantService";
 function Invoices({ selectedHouse, onDetailsClick }) {
   const [expenses, setExpenses] = useState([]);
   const [tenants, setTenants] = useState([]);
-  const [role, setRole] = useState(null); // Add state to store user role
+  const [role, setRole] = useState(null); // Store user role
   const [loggedInTenantId, setLoggedInTenantId] = useState(null);
 
   const openPdf = async (expenseId) => {
     try {
-      // Faz a requisição para o backend
       const response = await axios.get(
         `http://localhost:8000/houses/expenses/${expenseId}/download`,
-        { responseType: "arraybuffer" } // Recebe o arquivo como arraybuffer
+        { responseType: "arraybuffer" }
       );
 
-      // Cria uma URL temporária para o arquivo PDF
       const url = window.URL.createObjectURL(
         new Blob([response.data], { type: "application/pdf" })
       );
 
-      // Abre a URL em uma nova aba
       window.open(url, "_blank");
     } catch (error) {
       console.error("Error fetching the PDF:", error);
@@ -45,7 +42,7 @@ function Invoices({ selectedHouse, onDetailsClick }) {
     const fetchRole = async () => {
       try {
         const UserRole = await tenantService.fetchUserRole();
-        setRole(UserRole); // Store user role in state
+        setRole(UserRole);
       } catch (error) {
         console.error("Error fetching user role:", error);
       }
@@ -53,121 +50,67 @@ function Invoices({ selectedHouse, onDetailsClick }) {
     fetchRole();
   }, []);
 
-  // Fetch expenses based on the selected house
+  // Fetch tenant ID and expenses
   useEffect(() => {
     if (selectedHouse && selectedHouse.id) {
-      const fetchExpenses = async () => {
+      const fetchData = async () => {
         try {
+          // Fetch tenant ID if role is "tenant"
+          if (role === "tenant") {
+            const tenantId = await tenantService.fetchTenantId();
+            console.log("tenantId AQUI", tenantId);
+            setLoggedInTenantId(tenantId);
+          }
+
+          // Fetch expenses
           const response = await axios.get(
             `http://localhost:8000/houses/expenses/${selectedHouse.id}`
           );
-          const pendingExpenses = response.data.filter((expense) => expense.status !== "paid");
-          setExpenses(pendingExpenses);
+
+          // Filter expenses based on tenant payment status
+          const filteredExpenses = response.data.filter((expense) => {
+            if (role === "tenant" && loggedInTenantId) {
+              const tenantStatus = expense.tenants.find(
+                (tenant) => tenant.tenant_id === loggedInTenantId
+              )?.status;
+              return tenantStatus !== "paid";
+            }
+            return expense.status !== "paid";
+          });
+
+          setExpenses(filteredExpenses);
         } catch (error) {
-          console.error("Error fetching expenses:", error);
+          console.error("Error fetching expenses or tenant ID:", error);
         }
       };
-      fetchExpenses();
+      fetchData();
     }
-  }, [selectedHouse]);
+  }, [selectedHouse, role, loggedInTenantId]);
 
-  // useEffect(() => {
-  //   const fetchTenant = async () => {
-  //     try {
-  //       const tenantId = await tenantService.fetchTenantId();
-  //       console.log("Fetched Tenant ID:", tenantId); // Debug line
-  //       setLoggedInTenantId(tenantId);
-  //     } catch (error) {
-  //       console.error("Failed to fetch tenant ID:", error);
-  //     }
-  //   };
-  //   fetchTenant();
-  // }, []);
-
-  const handleDetailsClick = async (expenseId) => {
-    try {
-      // Fetch tenant payment statuses for the selected expense
-      const response = await axios.get(`http://localhost:8000/houses/expense/${expenseId}`);
-
-      console.log("Tenant data for expense:", response.data); // Debug line
-
-      if (response.data && response.data.tenants) {
-        console.log("Tenants:", response.data.tenants); // Debug line
-        setTenants(response.data.tenants); // Display tenant payment statuses
-        const allPaid = response.data.tenants.every((tenant) => tenant.status === "paid");
-
-        if (allPaid) {
-          // Update the status of the expense to 'paid'
-          await axios.put(`http://localhost:8000/houses/expenses/${expenseId}/mark-paid`);
-        }
-      } else {
-        console.warn("No tenant data received for the selected expense");
-      }
-
-      // Refresh invoices to reflect any changes
-      const updatedInvoicesResponse = await axios.get(
-        `http://localhost:8000/houses/expenses/${selectedHouse.id}`
-      );
-      const pendingExpenses = updatedInvoicesResponse.data.filter(
-        (expense) => expense.status !== "paid"
-      );
-      setExpenses(pendingExpenses);
-
-      onDetailsClick(expenseId); // Pass expenseId for tracking
-    } catch (error) {
-      console.error("Error fetching tenant payment status or updating expense:", error);
-    }
-  };
-
-  // const handlePayedClick = async (expenseId) => {
-  //   try {
-  //     await axios.put(`http://localhost:8000/houses/expenses/${expenseId}/mark-paid`);
-  //     setPaidExpenses((prev) => new Set([...prev, expenseId])); // Mark expense as paid
-  //   } catch (error) {
-  //     console.error("Error marking expense as paid:", error);
-  //   }
-  // };
   const handlePayedClick = async (expense) => {
     try {
-      let tenantId = loggedInTenantId;
-
-      // Fetch tenant ID if not already available
-      if (!tenantId) {
-        try {
-          tenantId = await tenantService.fetchTenantId();
-          console.log("Fetched Tenant ID:", tenantId); // Debug line
-          setLoggedInTenantId(tenantId);
-        } catch (error) {
-          console.error("Failed to fetch tenant ID:", error);
-          toast.error("Unable to fetch tenant ID");
-          return; // Exit early if tenant ID fetch fails
-        }
+      if (!loggedInTenantId) {
+        const tenantId = await tenantService.fetchTenantId();
+        setLoggedInTenantId(tenantId);
       }
 
-      // Proceed with marking the expense as paid
-      await axios.put(
-        `http://localhost:8000/houses/tenants/${tenantId}/pay`,
-        null, // No request body is sent
-        {
-          params: { expense_id: expense.id }, // Pass expense_id as a query parameter
-        }
-      );
+      await axios.put(`http://localhost:8000/houses/tenants/${loggedInTenantId}/pay`, null, {
+        params: { expense_id: expense.id },
+      });
 
-      // Update the local state to reflect the change
       setExpenses((prevExpenses) =>
         prevExpenses.map((e) =>
           e.id === expense.id
             ? {
                 ...e,
                 tenants: e.tenants.map((t) =>
-                  t.tenant_id === tenantId ? { ...t, status: "paid" } : t
+                  t.tenant_id === loggedInTenantId ? { ...t, status: "paid" } : t
                 ),
               }
             : e
         )
       );
 
-      console.log("Payment marked as paid successfully!");
       toast.success("Payment marked as paid successfully!");
     } catch (error) {
       console.error("Error marking expense as paid:", error);
@@ -184,9 +127,9 @@ function Invoices({ selectedHouse, onDetailsClick }) {
       </MDBox>
       <MDBox p={2}>
         <MDBox component="ul" display="flex" flexDirection="column" p={0} m={0}>
-          {expenses.map((expense, index) => (
+          {expenses.map((expense) => (
             <MDBox
-              key={index}
+              key={expense.id}
               display="flex"
               justifyContent="space-between"
               alignItems="center"
@@ -224,12 +167,11 @@ function Invoices({ selectedHouse, onDetailsClick }) {
                     </MDTypography>
                   </MDTypography>
                 )}
-                {role !== "tenant" ? ( // Conditionally render the Details button
+                {role !== "tenant" ? (
                   <MDButton
                     variant="outlined"
                     color="info"
                     size="small"
-                    // onClick={() => handleDetailsClick(expense.id)}
                     onClick={() => onDetailsClick(expense.id)}
                   >
                     Details
@@ -249,7 +191,7 @@ function Invoices({ selectedHouse, onDetailsClick }) {
                         expense.tenants.find((t) => t.tenant_id === loggedInTenantId)?.status !==
                         "paid"
                       ) {
-                        handlePayedClick(expense); // Only call if not already paid
+                        handlePayedClick(expense);
                       }
                     }}
                     disabled={
